@@ -58,7 +58,7 @@ TEST_P(MaterializedViewsStarRewriteTest, starRewrite) {
       [&]() { materializedViewsTestHelpers::removeTestIndex(onDiskBase); });
   qlever::EngineConfig config;
   config.baseName_ = onDiskBase;
-  qlever::Qlever qlv{config};
+  qlever::Qlever qlv{config, qlever::makeAllocator<Id>()};
 
   // Without the materialized view, a regular join is executed.
   h::expect(std::string{simpleStar},

@@ -81,7 +81,8 @@ class MaterializedViewsTest : public ::testing::Test {
     makeTestIndex(testIndexBase_, getDummyTurtle());
     qlever::EngineConfig config;
     config.baseName_ = testIndexBase_;
-    qlv_ = std::make_shared<qlever::Qlever>(config);
+    qlv_ =
+        std::make_shared<qlever::Qlever>(config, qlever::makeAllocator<Id>());
   }
 
   // ___________________________________________________________________________

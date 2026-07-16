@@ -48,8 +48,7 @@ TEST(LibQlever, buildIndexAndRunQuery) {
 
   {
     EngineConfig ec{c};
-    Qlever engine{ec};
-    // Run a simple query.
+    Qlever engine{ec, qlever::makeAllocator<Id>()};  // Run a simple query.
     std::string query = "SELECT ?s WHERE { ?s <p> <o> }";
     auto res = engine.query(query, ad_utility::MediaType::tsv);
     EXPECT_EQ(res, "?s\n<s>\n");
@@ -100,7 +99,7 @@ TEST(LibQlever, buildIndexAndRunQuery) {
   EXPECT_NO_THROW(Qlever::buildIndex(c));
   EngineConfig ec{c};
   ec.loadTextIndex_ = true;
-  Qlever engine{ec};
+  Qlever engine{ec, qlever::makeAllocator<Id>()};
 #endif
 }
 
@@ -133,7 +132,8 @@ TEST(LibQlever, fulltextIndex) {
   {
     EngineConfig ec{c};
     ec.loadTextIndex_ = true;
-    Qlever engine{ec};
+
+    Qlever engine{ec, qlever::makeAllocator<Id>()};
     // Run a simple query.
     auto res = engine.query(
         "SELECT ?s ?p ?o ?t WHERE { ?t ql:contains-word \"kartoff*\". ?t "
@@ -158,7 +158,8 @@ TEST(LibQlever, fulltextIndex) {
   {
     EngineConfig ec{c};
     ec.loadTextIndex_ = true;
-    Qlever engine{ec};
+
+    Qlever engine{ec, qlever::makeAllocator<Id>()};
     // Run a simple query.
     auto res = engine.query(
         "SELECT ?s ?p ?o ?t WHERE { ?t ql:contains-word \"kartoff*\". ?t "
@@ -214,7 +215,7 @@ TEST(LibQlever, loadIndexWithoutPermutations) {
   // Load the index with `doNotLoadPermutations` set to true.
   EngineConfig ec{c};
   ec.doNotLoadPermutations_ = true;
-  Qlever engine{ec};
+  Qlever engine{ec, qlever::makeAllocator<Id>()};
 
   // Test that the `setKbName` function silently does nothing, if we have no
   // index.
@@ -254,7 +255,7 @@ TEST(LibQlever, disableCaching) {
   {
     // Load the index with `disableCaching` set to true.
     ec.disableCaching_ = QueryExecutionContext::DisableCaching::True;
-    Qlever engine{ec};
+    Qlever engine{ec, qlever::makeAllocator<Id>()};
     auto plan = engine.parseAndPlanQuery("SELECT ?s WHERE {?x <p> ?o}");
     auto& qec = plan.queryExecutionContext();
     EXPECT_TRUE(qec.disableCaching());
@@ -262,7 +263,7 @@ TEST(LibQlever, disableCaching) {
   {
     // Load the index with `disableCaching` set to false.
     ec.disableCaching_ = QueryExecutionContext::DisableCaching::False;
-    Qlever engine{ec};
+    Qlever engine{ec, qlever::makeAllocator<Id>()};
     {
       auto plan = engine.parseAndPlanQuery("SELECT ?s WHERE {?x <p> ?o}");
       auto& qec = plan.queryExecutionContext();
@@ -275,7 +276,7 @@ TEST(LibQlever, disableCaching) {
     // (default value)..
     ec.disableCaching_ =
         QueryExecutionContext::DisableCaching::FromRuntimeParameter;
-    Qlever engine{ec};
+    Qlever engine{ec, qlever::makeAllocator<Id>()};
     {
       auto plan = engine.parseAndPlanQuery("SELECT ?s WHERE {?x <p> ?o}");
       auto& qec = plan.queryExecutionContext();
@@ -309,7 +310,7 @@ TEST(LibQlever, externallySpecifiedValues) {
   EngineConfig ec{c};
   // Caching must be disabled for externally specified values.
   ec.disableCaching_ = QueryExecutionContext::DisableCaching::True;
-  Qlever engine{ec};
+  Qlever engine{ec, qlever::makeAllocator<Id>()};
 
   // Parse a query that uses externally specified values joined with the index.
   // Use both syntaxes, the preferred one, and the deprecated one kept for

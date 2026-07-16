@@ -1513,7 +1513,7 @@ TEST(MaterializedViewsSpatialJoinTest, BoundingBoxBindRewrite) {
       [&]() { materializedViewsTestHelpers::removeTestIndex(onDiskBase); });
   qlever::EngineConfig config;
   config.baseName_ = onDiskBase;
-  qlever::Qlever qlv{config};
+  qlever::Qlever qlv{config, qlever::makeAllocator<Id>()};
 
   // Write geometries view with bounding boxes.
   qlv.writeMaterializedView(viewName, std::string{geoBoundingBoxesViewQuery});
@@ -1628,7 +1628,7 @@ TEST_P(MaterializedViewsChainRewriteTest, simpleChain) {
       [&]() { materializedViewsTestHelpers::removeTestIndex(onDiskBase); });
   qlever::EngineConfig config;
   config.baseName_ = onDiskBase;
-  qlever::Qlever qlv{config};
+  qlever::Qlever qlv{config, qlever::makeAllocator<Id>()};
 
   // Without the materialized view, a regular join is executed.
   h::expect(std::string{simpleChain},

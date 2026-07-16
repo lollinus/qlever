@@ -54,7 +54,7 @@ using ad_utility::MediaType;
 // __________________________________________________________________________
 Server::Server(unsigned short port, size_t numThreads, std::string accessToken,
                const qlever::EngineConfig& config, bool noAccessCheck)
-    : qlever_(config),
+    : qlever_(config, qlever::makeAllocator<Id>()),
       numThreads_(numThreads),
       port_(port),
       accessToken_(std::move(accessToken)),

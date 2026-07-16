@@ -6,7 +6,10 @@
 
 #include <iostream>
 
+#include "global/Id.h"
 #include "libqlever/Qlever.h"
+#include "util/Allocator.h"
+#include "util/AllocatorWithLimit.h"
 #include "util/Exception.h"
 #include "util/Timer.h"
 
@@ -45,7 +48,8 @@ int main(int argc, char** argv) {
   std::cout << "\x1b[1mLoading index with basename \"" << indexBasename
             << "\"\x1b[0m" << std::endl;
   qlever::EngineConfig engineConfig{config};
-  qlever::Qlever qlever{engineConfig};
+
+  qlever::Qlever qlever{engineConfig, qlever::makeAllocator<Id>()};
   std::cout << std::endl;
 
   // Execute query.

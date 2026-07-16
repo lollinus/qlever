@@ -23,14 +23,8 @@
 namespace qlever {
 
 // _____________________________________________________________________________
-Qlever::Qlever(const EngineConfig& config)
-    : allocator_{ad_utility::AllocatorWithLimit<Id>{
-          ad_utility::makeAllocationMemoryLeftThreadsafeObject(
-              config.memoryLimit_.value_or(DEFAULT_MEM_FOR_QUERIES)),
-          [this](ad_utility::MemorySize numMemoryToAllocate) {
-            cache_.makeRoomAsMuchAsPossible(MAKE_ROOM_SLACK_FACTOR *
-                                            numMemoryToAllocate);
-          }}},
+Qlever::Qlever(const EngineConfig& config, Allocator<Id> allocator)
+    : allocator_{std::move(allocator)},
       indexAndViews_{std::make_shared<IndexAndViews>(
           Index{allocator_}, MaterializedViewsManager{})},
       enablePatternTrick_{!config.noPatterns_},
@@ -118,8 +112,8 @@ void Qlever::buildIndex(IndexBuilderConfig config) {
 
   if (config.wordsAndDocsFileSpecified() || config.addWordsFromLiterals_) {
 #ifndef QLEVER_REDUCED_FEATURE_SET_FOR_CPP17
-    auto textIndexBuilder = TextIndexBuilder(
-        ad_utility::makeUnlimitedAllocator<Id>(), index.getOnDiskBase());
+    auto textIndexBuilder =
+        TextIndexBuilder(qlever::makeAllocator<Id>(), index.getOnDiskBase());
     textIndexBuilder.buildTextIndexFile(
         config.wordsAndDocsFileSpecified()
             ? std::optional{std::pair{config.wordsfile_, config.docsfile_}}
@@ -142,7 +136,7 @@ void Qlever::buildIndex(IndexBuilderConfig config) {
     AD_LOG_INFO << "Loading the new index to execute materialized view write "
                    "queries ..."
                 << std::endl;
-    Qlever engine{EngineConfig{config}};
+    Qlever engine{EngineConfig{config}, qlever::makeAllocator<Id>()};
     for (auto& [viewName, query] : config.writeMaterializedViews_) {
       engine.writeMaterializedView(viewName, query);
     }
