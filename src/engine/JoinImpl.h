@@ -127,8 +127,7 @@ class JoinImpl : public Operation {
   [[nodiscard]] bool isDeterministicImpl() const override { return true; }
 
   std::optional<std::shared_ptr<QueryExecutionTree>>
-  makeTreeWithStrippedColumns(
-      const std::set<Variable>& variables) const override;
+  makeTreeWithStrippedColumns(const qlever::set<Variable>& variables) const;
 
   std::optional<std::shared_ptr<QueryExecutionTree>> makeTreeWithBindColumn(
       const parsedQuery::Bind& bind) const override;

@@ -766,8 +766,8 @@ bool JoinImpl::columnOriginatesFromGraphOrUndef(
 // _____________________________________________________________________________
 std::optional<std::shared_ptr<QueryExecutionTree>>
 JoinImpl::makeTreeWithStrippedColumns(
-    const std::set<Variable>& variables) const {
-  std::set<Variable> newVariables;
+    const qlever::set<Variable>& variables) const {
+  qlever::set<Variable> newVariables{allocator()};
   const auto* vars = &variables;
   if (!ad_utility::contains(variables, joinVar_)) {
     newVariables = variables;

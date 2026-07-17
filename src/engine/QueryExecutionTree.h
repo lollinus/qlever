@@ -15,6 +15,7 @@
 #include "engine/QueryExecutionContext.h"
 #include "parser/ParsedQuery.h"
 #include "parser/data/Types.h"
+#include "util/AllocatorAwareContainers.h"
 #include "util/HashSet.h"
 
 // Strongly typed enum for controlling whether stripped variables are explicitly
@@ -216,6 +217,11 @@ class QueryExecutionTree {
       const std::set<Variable>& variablesToKeep,
       HideStrippedColumns hideStrippedColumns = HideStrippedColumns::False);
 
+  static std::shared_ptr<QueryExecutionTree> makeTreeWithStrippedColumns(
+      std::shared_ptr<QueryExecutionTree> qet,
+      const qlever::set<Variable>& variablesToKeep,
+      HideStrippedColumns hideStrippedColumns = HideStrippedColumns::False);
+
   // Return the column pairs where the two `QueryExecutionTree`s have the
   // same variable. The result is sorted by the column indices, so that it is
   // deterministic when called repeatedly. This is important to find a
@@ -323,8 +329,11 @@ namespace ad_utility {
 template <typename Operation, typename... Args>
 std::shared_ptr<QueryExecutionTree> makeExecutionTree(
     QueryExecutionContext* qec, Args&&... args) {
-  return std::make_shared<QueryExecutionTree>(
-      qec, std::make_shared<Operation>(qec, AD_FWD(args)...));
+  auto allocator = qec->getAllocator();
+  auto operation =
+      std::allocate_shared<Operation>(allocator, qec, AD_FWD(args)...);
+  return std::allocate_shared<QueryExecutionTree>(allocator, qec,
+                                                  std::move(operation));
 }
 }  // namespace ad_utility
 

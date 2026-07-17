@@ -96,7 +96,9 @@ uint64_t Join::getSizeEstimateBeforeLimit() {
 // ____________________________________________________________________________
 std::optional<std::shared_ptr<QueryExecutionTree>>
 Join::makeTreeWithStrippedColumns(const std::set<Variable>& variables) const {
-  return impl_->makeTreeWithStrippedColumns(variables);
+  // TODO temporary workaround to try new allocator
+  qlever::set<Variable> v{variables.begin(), variables.end(), allocator()};
+  return impl_->makeTreeWithStrippedColumns(v);
 }
 
 // ____________________________________________________________________________

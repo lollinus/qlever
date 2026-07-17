@@ -254,6 +254,15 @@ QueryExecutionTree::makeTreeWithStrippedColumns(
   return resultTree;
 }
 
+std::shared_ptr<QueryExecutionTree>
+QueryExecutionTree::makeTreeWithStrippedColumns(
+    std::shared_ptr<QueryExecutionTree> qet,
+    const qlever::set<Variable>& variablesToKeep,
+    HideStrippedColumns hideStrippedColumns) {
+  std::set<Variable> v{variablesToKeep.begin(), variablesToKeep.end()};
+
+  return makeTreeWithStrippedColumns(std::move(qet), v, hideStrippedColumns);
+}
 // _____________________________________________________________________________
 std::vector<std::array<ColumnIndex, 2>> QueryExecutionTree::getJoinColumns(
     const QueryExecutionTree& qetA, const QueryExecutionTree& qetB) {

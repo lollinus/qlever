@@ -115,13 +115,13 @@ TEST(QueryExecutionTree, limitAndOffsetIsPropagatedWhenStrippingColumns) {
   valuesForTesting->applyLimitOffset(limitOffset);
 
   auto strippedIndex = QueryExecutionTree::makeTreeWithStrippedColumns(
-      indexScan, {Variable{"?s"}});
+      indexScan, std::set<Variable>{Variable{"?s"}});
   EXPECT_EQ(strippedIndex->getRootOperation()->getLimitOffset(), limitOffset);
   EXPECT_TRUE(
       std::dynamic_pointer_cast<IndexScan>(strippedIndex->getRootOperation()));
 
   auto strippedValues = QueryExecutionTree::makeTreeWithStrippedColumns(
-      valuesForTesting, {Variable{"?s"}});
+      valuesForTesting, std::set<Variable>{Variable{"?s"}});
   EXPECT_TRUE(
       strippedValues->getRootOperation()->getLimitOffset().isUnconstrained());
   ASSERT_TRUE(std::dynamic_pointer_cast<StripColumns>(
@@ -145,23 +145,25 @@ TEST(QueryExecutionTree, strippingColumnsIsNoOpWhenAllVariablesAreKept) {
       Vars{Variable{"?x1"}, Variable{"?x2"}});
 
   EXPECT_EQ(QueryExecutionTree::makeTreeWithStrippedColumns(
-                valuesForTesting, {Variable{"?x1"}, Variable{"?x2"}}),
+                valuesForTesting,
+                std::set<Variable>{Variable{"?x1"}, Variable{"?x2"}}),
             valuesForTesting);
 
-  EXPECT_EQ(QueryExecutionTree::makeTreeWithStrippedColumns(
-                valuesForTesting,
-                {Variable{"?x1"}, Variable{"?x2"}, Variable{"?x3"}}),
-            valuesForTesting);
+  EXPECT_EQ(
+      QueryExecutionTree::makeTreeWithStrippedColumns(
+          valuesForTesting, std::set<Variable>{Variable{"?x1"}, Variable{"?x2"},
+                                               Variable{"?x3"}}),
+      valuesForTesting);
 
   auto valuesForTestingNoVars = ad_utility::makeExecutionTree<ValuesForTesting>(
       qec, makeIdTableFromVector({{}}), Vars{});
 
   EXPECT_EQ(QueryExecutionTree::makeTreeWithStrippedColumns(
-                valuesForTestingNoVars, {}),
+                valuesForTestingNoVars, std::set<Variable>{}),
             valuesForTestingNoVars);
 
   EXPECT_EQ(QueryExecutionTree::makeTreeWithStrippedColumns(
-                valuesForTestingNoVars, {Variable{"?x"}}),
+                valuesForTestingNoVars, std::set<Variable>{Variable{"?x"}}),
             valuesForTestingNoVars);
 }
 
@@ -191,8 +193,8 @@ TEST(QueryExecutionTree,
                 ->getLimitOffset(),
             limitOffset);
 
-  auto strippedValues =
-      QueryExecutionTree::makeTreeWithStrippedColumns(sort, {Variable{"?s"}});
+  auto strippedValues = QueryExecutionTree::makeTreeWithStrippedColumns(
+      sort, std::set<Variable>{Variable{"?s"}});
   EXPECT_TRUE(
       indexScan->getRootOperation()->getLimitOffset().isUnconstrained());
 
