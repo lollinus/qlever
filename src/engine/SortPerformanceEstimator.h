@@ -9,6 +9,7 @@
 
 #include "global/Id.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 #include "util/Timer.h"
 
 /// Estimates the time it takes to sort an IdTable with a given number of rows
@@ -26,7 +27,7 @@ class SortPerformanceEstimator {
   // this table and return the time that this sorting took.
   static Timer::Duration measureSortingTime(
       size_t numRows, size_t numColumns,
-      const ad_utility::AllocatorWithLimit<Id>& allocator);
+      const qlever::Allocator<Id>& allocator);
 
   // Compute and return an Estimate for how long sorting an IdTable with the
   // specified number of rows and columns takes.
@@ -39,14 +40,14 @@ class SortPerformanceEstimator {
 
   // Expensive constructor, directly calls computeEstimatesExpensively
   explicit SortPerformanceEstimator(
-      const ad_utility::AllocatorWithLimit<Id>& allocator,
+      const qlever::Allocator<Id>& allocator,
       size_t maxNumberOfElementsToSort);
 
   /// Set up the sort estimates. This will take some time. Only samples, that
   /// can be allocated by the allocator and that have less than
   /// `maxNumberOfElementsToSort` elements will actually be measured.
   void computeEstimatesExpensively(
-      const ad_utility::AllocatorWithLimit<Id>& allocator,
+      const qlever::Allocator<Id>& allocator,
       size_t maxNumberOfElementsToSort);
 
   // Throw an exception if the estimated time to sort an IdTable with the given

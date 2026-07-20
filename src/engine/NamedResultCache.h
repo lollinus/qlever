@@ -10,6 +10,7 @@
 #include <boost/optional.hpp>
 
 #include "engine/ExplicitIdTableOperation.h"
+#include "util/Allocator.h"
 #include "engine/SpatialJoinCachedIndex.h"
 #include "index/LocalVocab.h"
 #include "util/Cache.h"
@@ -39,7 +40,7 @@ class NamedResultCache {
 
     // The following two members (`Allocator` and `LocalVocabContext`) are only
     // used when reading a `Value` from a serializer.
-    using Allocator = ad_utility::AllocatorWithLimit<Id>;
+    using Allocator = qlever::Allocator<Id>;
     std::optional<Allocator> allocatorForSerialization_{std::nullopt};
     const LocalVocabContext* contextForSerialization_{nullptr};
   };

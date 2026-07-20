@@ -13,6 +13,7 @@
 #include <future>
 
 #include "backports/algorithm.h"
+#include "util/Allocator.h"
 #include "engine/CallFixedSize.h"
 #include "engine/idTable/IdTable.h"
 #include "util/AsyncStream.h"
@@ -74,7 +75,7 @@ class CompressedExternalIdTableWriter {
   // where the blocks of this table begin.
   std::vector<size_t> startOfSingleIdTables_;
 
-  ad_utility::AllocatorWithLimit<Id> allocator_;
+  qlever::Allocator<Id> allocator_;
   // Each column of each `IdTable` will be split up into blocks of this size and
   // then separately compressed and stored. Has to be chosen s.t. it is much
   // smaller than the size of the single `IdTables` and  large enough to make
@@ -92,7 +93,7 @@ class CompressedExternalIdTableWriter {
   // `IdTables` that will be passed in has to have exactly `numCols` columns.
   explicit CompressedExternalIdTableWriter(
       std::string filename, size_t numCols,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       ad_utility::MemorySize blockSizeUncompressed =
           DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE)
       : filename_{std::move(filename)},
@@ -383,7 +384,7 @@ CPP_class_template(size_t NumStaticCols,
 
   explicit CompressedExternalIdTableBase(
       std::string filename, size_t numCols, ad_utility::MemorySize memory,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       MemorySize blocksizeCompression = DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE,
       BlockTransformation blockTransformation = {})
       : currentBlock_{numCols, allocator},
@@ -516,7 +517,7 @@ class CompressedExternalIdTable
   // Constructor.
   explicit CompressedExternalIdTable(
       std::string filename, size_t numCols, ad_utility::MemorySize memory,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       MemorySize blocksizeCompression = DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE)
       : Base{std::move(filename), numCols, memory, std::move(allocator),
              blocksizeCompression} {}
@@ -525,7 +526,7 @@ class CompressedExternalIdTable
   // constructor is redundant.
   CPP_member explicit CPP_ctor(CompressedExternalIdTable)(
       std::string filename, ad_utility::MemorySize memory,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       MemorySize blocksizeCompression = DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE)(
       requires(NumStaticCols > 0))
       : CompressedExternalIdTable(std::move(filename), NumStaticCols, memory,
@@ -636,7 +637,7 @@ class CompressedExternalIdTableSorter
   // Constructor.
   CompressedExternalIdTableSorter(
       std::string filename, size_t numCols, ad_utility::MemorySize memory,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       MemorySize blocksizeCompression = DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE,
       Comparator comparator = {})
       : Base{std::move(filename),
@@ -651,7 +652,7 @@ class CompressedExternalIdTableSorter
   // constructor is redundant.
   CPP_member CPP_ctor(CompressedExternalIdTableSorter)(
       std::string filename, ad_utility::MemorySize memory,
-      ad_utility::AllocatorWithLimit<Id> allocator,
+      qlever::Allocator<Id> allocator,
       MemorySize blocksizeCompression = DEFAULT_BLOCKSIZE_EXTERNAL_ID_TABLE,
       Comparator comp = {})(requires(NumStaticCols > 0))
       : CompressedExternalIdTableSorter(std::move(filename), NumStaticCols,
@@ -752,7 +753,7 @@ class CompressedExternalIdTableSorter
     size_t blockSizeOutput_;
 
     SortState(size_t numCols,
-              const ad_utility::AllocatorWithLimit<Id>& allocator,
+              const qlever::Allocator<Id>& allocator,
               CompType comp, RowGenVectorType rowGenerators, size_t blockSize,
               CompressedExternalIdTableSorter* sorter)
         : result_{numCols, allocator},

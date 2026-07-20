@@ -9,6 +9,7 @@
 // which can be found in the `LICENSE` file at the root of the QLever project.
 
 #include "index/Permutation.h"
+#include "util/Allocator.h"
 
 #include <absl/strings/str_cat.h>
 
@@ -249,7 +250,7 @@ Permutation::LazyScanWithReader Permutation::lazyScanWithUnlimitedReader(
     const LocatedTriplesState& locatedTriplesState) const {
   auto independentReader = std::make_unique<CompressedRelationReader>(
       reader().makeReaderWithReboundAllocator(
-          ad_utility::makeUnlimitedAllocator<Id>()));
+          qlever::makeAllocator<Id>()));
   auto blocks = lazyScanImpl(*independentReader, scanSpecAndBlocks,
                              std::nullopt, additionalColumns,
                              cancellationHandle, locatedTriplesState, {});

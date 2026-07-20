@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "backports/algorithm.h"
+#include "util/Allocator.h"
 #include "engine/Result.h"
 #include "engine/idTable/CompressedExternalIdTable.h"
 #include "global/SpecialIds.h"
@@ -158,7 +159,7 @@ class IndexImpl {
    * @brief Maps pattern ids to sets of predicate ids.
    */
   CompactVectorOfStrings<Id> patterns_;
-  ad_utility::AllocatorWithLimit<Id> allocator_;
+  qlever::Allocator<Id> allocator_;
 
   // TODO: make those private and allow only const access
   // instantiations for the six permutations used in QLever.
@@ -200,7 +201,7 @@ class IndexImpl {
   GraphNameManager graphNameManager_ = GraphNameManager();
 
  public:
-  explicit IndexImpl(ad_utility::AllocatorWithLimit<Id> allocator);
+  explicit IndexImpl(qlever::Allocator<Id> allocator);
 
   // Forbid copying.
   IndexImpl& operator=(const IndexImpl&) = delete;
@@ -272,7 +273,7 @@ class IndexImpl {
     vocab_.writeAsZeroCopyBlob(serializer);
   }
 
-  const ad_utility::AllocatorWithLimit<Id>& allocator() const {
+  const qlever::Allocator<Id>& allocator() const {
     return allocator_;
   };
 
@@ -406,7 +407,7 @@ class IndexImpl {
   // textRecord, word. Sorted by textRecord.
   IdTable getWordPostingsForTerm(
       const std::string& wordOrPrefix,
-      const ad_utility::AllocatorWithLimit<Id>& allocator) const;
+      const qlever::Allocator<Id>& allocator) const;
 
   // Returns a set of textRecords and their corresponding entities and
   // scores. Each textRecord contains its corresponding entity and the term.
@@ -417,7 +418,7 @@ class IndexImpl {
   // TextIndexScanForWords operation.
   IdTable getEntityMentionsForWord(
       const std::string& term,
-      const ad_utility::AllocatorWithLimit<Id>& allocator) const;
+      const qlever::Allocator<Id>& allocator) const;
 
   size_t getIndexOfBestSuitedElTerm(
       const std::vector<std::string>& terms) const;
@@ -699,11 +700,11 @@ class IndexImpl {
    */
   IdTable mergeTextBlockResults(
       absl::FunctionRef<IdTable(const TextBlockMetaData&,
-                                const ad_utility::AllocatorWithLimit<ValueId>&,
+                                const qlever::Allocator<ValueId>&,
                                 const ad_utility::File&, TextScoringMetric)>
           reader,
       const std::vector<TextBlockMetadataAndWordInfo>& tbmds,
-      const ad_utility::AllocatorWithLimit<Id>& allocator,
+      const qlever::Allocator<Id>& allocator,
       TextScanMode textScanMode) const;
 
   TextBlockIndex getWordBlockId(WordIndex wordIndex) const;

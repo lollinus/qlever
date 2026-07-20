@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "backports/algorithm.h"
+#include "util/Allocator.h"
 #include "backports/three_way_comparison.h"
 #include "backports/type_traits.h"
 #include "engine/idTable/IdTable.h"
@@ -294,8 +295,8 @@ class CompressedRelationWriter {
   // are no additional special payloads.
   size_t numColumns_;
 
-  ad_utility::AllocatorWithLimit<Id> allocator_ =
-      ad_utility::makeUnlimitedAllocator<Id>();
+  qlever::Allocator<Id> allocator_ =
+      qlever::makeAllocator<Id>();
   // A buffer for small relations that will be stored in the same block.
   SmallRelationsBuffer smallRelationsBuffer_{numColumns_, allocator_};
   ad_utility::MemorySize uncompressedBlocksizePerColumn_;
@@ -541,7 +542,7 @@ class CompressedRelationReader {
   using vector = std::vector<T>;
 
  public:
-  using Allocator = ad_utility::AllocatorWithLimit<Id>;
+  using Allocator = qlever::Allocator<Id>;
   using ColumnIndicesRef = ql::span<const ColumnIndex>;
   using ColumnIndices = std::vector<ColumnIndex>;
   using CancellationHandle = ad_utility::SharedCancellationHandle;

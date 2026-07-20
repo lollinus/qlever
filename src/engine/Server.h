@@ -26,6 +26,7 @@
 #include "libqlever/Qlever.h"
 #include "libqlever/QleverTypes.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 #include "util/ParseException.h"
 #include "util/TypeTraits.h"
 #include "util/http/HttpUtils.h"
@@ -354,10 +355,10 @@ class Server {
 
   QueryResultCache& cache() { return qlever().cache(); }
   const QueryResultCache& cache() const { return qlever().cache(); }
-  ad_utility::AllocatorWithLimit<Id>& allocator() {
+  qlever::Allocator<Id>& allocator() {
     return qlever().allocator();
   }
-  const ad_utility::AllocatorWithLimit<Id>& allocator() const {
+  const qlever::Allocator<Id>& allocator() const {
     return qlever().allocator();
   }
   SortPerformanceEstimator& sortPerformanceEstimator() {

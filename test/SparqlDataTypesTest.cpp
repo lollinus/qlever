@@ -11,6 +11,7 @@
 #include <gmock/gmock.h>
 
 #include "./util/AllocatorTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/TripleComponentTestHelpers.h"
 #include "engine/ConstructBatchEvaluator.h"
 #include "engine/ConstructTemplatePreprocessor.h"
@@ -32,7 +33,7 @@ using Iri = ad_utility::triple_component::Iri;
 auto iriV = Iri::fromIrirefValidated;
 
 struct ContextWrapper {
-  Index _index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index _index{qlever::makeAllocator<Id>()};
   Result _resultTable{
       IdTable{ad_utility::testing::makeAllocator()}, {}, LocalVocab{}};
   // TODO<joka921> `VariableToColumnMap`

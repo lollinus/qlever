@@ -7,6 +7,7 @@
 #ifndef QLEVER_REDUCED_FEATURE_SET_FOR_CPP17
 
 #include "engine/TransitivePathHashMap.h"
+#include "util/Allocator.h"
 
 #include <memory>
 
@@ -15,7 +16,7 @@
 
 // _____________________________________________________________________________
 HashMapWrapper::HashMapWrapper(
-    Map map, const ad_utility::AllocatorWithLimit<Id>& allocator)
+    Map map, const qlever::Allocator<Id>& allocator)
     : graphMap_{allocator},
       map_{nullptr},
       emptySet_{allocator},
@@ -26,7 +27,7 @@ HashMapWrapper::HashMapWrapper(
 
 // _____________________________________________________________________________
 HashMapWrapper::HashMapWrapper(
-    MapOfMaps graphMap, const ad_utility::AllocatorWithLimit<Id>& allocator)
+    MapOfMaps graphMap, const qlever::Allocator<Id>& allocator)
     : graphMap_{std::move(graphMap)},
       map_{&emptyMap_},
       emptySet_{allocator},

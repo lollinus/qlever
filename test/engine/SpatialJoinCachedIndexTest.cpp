@@ -6,6 +6,7 @@
 #include <s2/mutable_s2shape_index.h>
 
 #include "../QueryPlannerTestHelpers.h"
+#include "util/Allocator.h"
 #include "../util/IndexTestHelpers.h"
 #include "./SpatialJoinTestHelpers.h"
 #include "engine/NamedResultCache.h"
@@ -27,7 +28,7 @@ void serializeAndDeserializeCache(NamedResultCache& cache,
   cache.writeToSerializer(writer);
   cache.clear();
   ByteBufferReadSerializer reader{std::move(writer).data()};
-  cache.readFromSerializer(reader, ad_utility::makeUnlimitedAllocator<Id>(),
+  cache.readFromSerializer(reader, qlever::makeAllocator<Id>(),
                            qec->getLocalVocabContext());
 }
 

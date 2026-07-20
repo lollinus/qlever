@@ -10,6 +10,7 @@
 #include <regex>
 
 #include "backports/StartsWithAndEndsWith.h"
+#include "util/Allocator.h"
 #include "engine/Service.h"
 #include "engine/Sort.h"
 #include "engine/Values.h"
@@ -847,7 +848,7 @@ TEST_F(ServiceTest, precomputeSiblingResult) {
       // yield each row individually
       return {[&](IdTable clone) -> Result::Generator {
                 IdTable idt{clone.numColumns(),
-                            ad_utility::makeUnlimitedAllocator<IdTable>()};
+                            qlever::makeAllocator<IdTable>()};
                 for (size_t i = 0; i < clone.size(); ++i) {
                   idt.push_back(clone[i]);
                   Result::IdTableVocabPair pair{std::move(idt), LocalVocab{}};

@@ -1731,7 +1731,7 @@ CPP_template(typename NumJoinColumnsT, typename LeftSide, typename RightSide,
 
     // Get allocator and number of columns from the first block.
     // TODO<joka921> pass in a proper allocator here.
-    auto allocator = makeUnlimitedAllocator<Id>();
+    auto allocator = qlever::makeAllocator<Id>();
     AD_CORRECTNESS_CHECK(!blocksLeft.empty() && !blocksRight.empty());
 
     // TODO<joka921> This can be much more efficient, in particular it could use

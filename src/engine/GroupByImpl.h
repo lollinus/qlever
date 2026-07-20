@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "backports/algorithm.h"
+#include "util/Allocator.h"
 #include "backports/concepts.h"
 #include "engine/GroupByHashMapOptimization.h"
 #include "engine/Join.h"
@@ -42,7 +43,7 @@ class GroupByImpl : public Operation {
   using string = std::string;
   template <typename T>
   using vector = std::vector<T>;
-  using Allocator = ad_utility::AllocatorWithLimit<Id>;
+  using Allocator = qlever::Allocator<Id>;
 
   std::shared_ptr<QueryExecutionTree> _subtree;
   vector<Variable> _groupByVariables;
@@ -356,7 +357,7 @@ class GroupByImpl : public Operation {
                            std::array<A, NUM_GROUP_COLUMNS>, std::vector<A>>;
 
     HashMapAggregationData(
-        const ad_utility::AllocatorWithLimit<Id>& alloc,
+        const qlever::Allocator<Id>& alloc,
         const std::vector<HashMapAliasInformation>& aggregateAliases,
         size_t numOfGroupedColumns)
         : numOfGroupedColumns_{numOfGroupedColumns},
@@ -427,7 +428,7 @@ class GroupByImpl : public Operation {
 
    private:
     // Allocator used for creating new vectors.
-    const ad_utility::AllocatorWithLimit<Id>& alloc_;
+    const qlever::Allocator<Id>& alloc_;
     // Maps `Id` to vector offsets.
     ad_utility::HashMapWithMemoryLimit<ArrayOrVector<Id>, size_t> map_;
     // Stores the actual aggregation data.

@@ -31,6 +31,7 @@
 #include "parser/SparqlParser.h"
 #include "parser/TripleComponent.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 #include "util/Exception.h"
 #include "util/MemorySize/MemorySize.h"
 #include "util/ProgressBar.h"
@@ -41,7 +42,7 @@ MaterializedViewWriter::MaterializedViewWriter(
     std::string onDiskBase, std::string name,
     const qlever::PlannedQuery& plannedQuery,
     ad_utility::MemorySize memoryLimit,
-    ad_utility::AllocatorWithLimit<Id> allocator)
+    qlever::Allocator<Id> allocator)
     : onDiskBase_{std::move(onDiskBase)},
       name_{std::move(name)},
       qet_{plannedQuery.sharedQueryExecutionTree()},
@@ -63,7 +64,7 @@ MaterializedViewWriter::MaterializedViewWriter(
 void MaterializedViewsManager::writeViewToDisk(
     std::string name, const qlever::PlannedQuery& plannedQuery,
     ad_utility::MemorySize memoryLimit,
-    ad_utility::AllocatorWithLimit<Id> allocator) const {
+    qlever::Allocator<Id> allocator) const {
   unloadViewIfLoaded(name);
   MaterializedViewWriter writer{onDiskBase_, std::move(name), plannedQuery,
                                 std::move(memoryLimit), std::move(allocator)};

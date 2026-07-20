@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "backports/span.h"
+#include "util/Allocator.h"
 #include "engine/Result.h"
 #include "engine/Union.h"
 #include "engine/idTable/IdTable.h"
@@ -106,7 +107,7 @@ struct SortedUnionImpl
   LocalVocab localVocab_{};
 
   // Metadata
-  ad_utility::AllocatorWithLimit<Id> allocator_;
+  qlever::Allocator<Id> allocator_;
   bool requestLaziness_;
   std::vector<std::array<size_t, 2>> columnOrigins_;
   std::vector<std::array<size_t, 2>> targetOrder_;
@@ -118,7 +119,7 @@ struct SortedUnionImpl
   SortedUnionImpl(IterationData<Range1> data1, IterationData<Range2> data2,
                   bool requestLaziness,
                   const std::vector<std::array<size_t, 2>>& columnOrigins,
-                  const ad_utility::AllocatorWithLimit<Id>& allocator,
+                  const qlever::Allocator<Id>& allocator,
                   ql::span<const ColumnIndex, SPAN_SIZE> comparatorView,
                   Func applyPermutation)
       : data1_{std::move(data1)},
@@ -243,7 +244,7 @@ struct SortedUnionImpl
 template <size_t SPAN_SIZE, typename Range1, typename Range2, typename Func>
 SortedUnionImpl(IterationData<Range1>, IterationData<Range2>, bool,
                 const std::vector<std::array<size_t, 2>>&,
-                const ad_utility::AllocatorWithLimit<Id>&,
+                const qlever::Allocator<Id>&,
                 ql::span<const ColumnIndex, SPAN_SIZE>,
                 Func) -> SortedUnionImpl<SPAN_SIZE, Range1, Range2, Func>;
 }  // namespace sortedUnion

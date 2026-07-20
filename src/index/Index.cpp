@@ -5,12 +5,13 @@
 // Johannes Kalmbach (2018- , kalmbach@informatik.uni-freiburg.de)
 
 #include "index/Index.h"
+#include "util/Allocator.h"
 
 #include "index/IndexImpl.h"
 #include "util/MemorySize/MemorySize.h"
 
 // ____________________________________________________________________________
-Index::Index(ad_utility::AllocatorWithLimit<Id> allocator)
+Index::Index(qlever::Allocator<Id> allocator)
     : pimpl_{std::make_unique<IndexImpl>(std::move(allocator))} {}
 Index::Index(Index&&) noexcept = default;
 
@@ -94,14 +95,14 @@ size_t Index::getSizeOfTextBlocksSum(const std::string& word,
 // ____________________________________________________________________________
 IdTable Index::getWordPostingsForTerm(
     const std::string& term,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) const {
+    const qlever::Allocator<Id>& allocator) const {
   return pimpl_->getWordPostingsForTerm(term, allocator);
 }
 
 // ____________________________________________________________________________
 IdTable Index::getEntityMentionsForWord(
     const std::string& term,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) const {
+    const qlever::Allocator<Id>& allocator) const {
   return pimpl_->getEntityMentionsForWord(term, allocator);
 }
 

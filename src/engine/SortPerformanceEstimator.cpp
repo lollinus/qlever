@@ -3,6 +3,7 @@
 // Author: Johannes Kalmbach (kalmbach@cs.uni-freiburg.de)
 
 #include "engine/SortPerformanceEstimator.h"
+#include "util/Allocator.h"
 
 #include <absl/strings/str_cat.h>
 
@@ -21,7 +22,7 @@
 // ___________________________________________________________________
 IdTable createRandomIdTable(
     size_t numRows, size_t numColumns,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) {
+    const qlever::Allocator<Id>& allocator) {
   IdTable result{allocator};
   result.setNumColumns(numColumns);
   result.reserve(numRows);
@@ -45,7 +46,7 @@ constexpr bool isSorted(const std::array<size_t, I>& array) {
 // ____________________________________________________________________
 auto SortPerformanceEstimator::measureSortingTime(
     size_t numRows, size_t numColumns,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) -> Timer::Duration {
+    const qlever::Allocator<Id>& allocator) -> Timer::Duration {
   auto randomTable = createRandomIdTable(numRows, numColumns, allocator);
   ad_utility::Timer timer{ad_utility::Timer::Started};
   // Always sort on the first column for simplicity;
@@ -57,7 +58,7 @@ auto SortPerformanceEstimator::measureSortingTime(
 
 // ____________________________________________________________________________
 SortPerformanceEstimator::SortPerformanceEstimator(
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     size_t maxNumElementsToSort) {
   computeEstimatesExpensively(allocator, maxNumElementsToSort);
 }
@@ -119,7 +120,7 @@ auto SortPerformanceEstimator::estimatedSortTime(
 }
 
 void SortPerformanceEstimator::computeEstimatesExpensively(
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     size_t maxNumberOfElementsToSort) {
 #ifndef QLEVER_CPP_17
   static_assert(isSorted(sampleValuesCols));

@@ -7,6 +7,7 @@
 #include <thread>
 
 #include "./util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/IdTableHelpers.h"
 #include "index/CompressedRelation.h"
 #include "index/IndexImpl.h"
@@ -261,7 +262,7 @@ auto writeAndOpenRelations(const std::vector<RelationInput>& inputs,
       inputs, filename, blocksize);
   auto reader = [&]() {
     return std::make_unique<CompressedRelationReader>(
-        ad_utility::makeUnlimitedAllocator<Id>(),
+        qlever::makeAllocator<Id>(),
         ad_utility::File{filename, "r"});
   };
   return std::tuple{std::move(blocks), std::move(metaData), reader()};

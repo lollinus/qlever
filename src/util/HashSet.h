@@ -12,6 +12,7 @@
 #include <unordered_set>
 
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 
 namespace ad_utility {
 // Wrapper for HashSets (with elements of type T) to be used everywhere
@@ -31,7 +32,7 @@ using HashSet = absl::flat_hash_set<T, HashFct, EqualElem, Alloc>;
 template <class T,
           class HashFct = absl::container_internal::hash_default_hash<T>,
           class EqualElem = absl::container_internal::hash_default_eq<T>,
-          class Alloc = ad_utility::AllocatorWithLimit<T>>
+          class Alloc = qlever::Allocator<T>>
 using HashSetWithMemoryLimit = std::unordered_set<T, HashFct, EqualElem, Alloc>;
 
 }  // namespace ad_utility

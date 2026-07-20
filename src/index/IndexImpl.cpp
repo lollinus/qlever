@@ -4,6 +4,7 @@
 //          Johannes Kalmbach <kalmbach@cs.uni-freiburg.de>
 
 #include "index/IndexImpl.h"
+#include "util/Allocator.h"
 
 #include <absl/cleanup/cleanup.h>
 #include <absl/strings/str_join.h>
@@ -53,7 +54,7 @@ constexpr std::string_view BLANK_NODE_ALLOCATION_START =
     "num-blank-nodes-total";
 
 // _____________________________________________________________________________
-IndexImpl::IndexImpl(ad_utility::AllocatorWithLimit<Id> allocator)
+IndexImpl::IndexImpl(qlever::Allocator<Id> allocator)
     : allocator_{std::move(allocator)} {
   deltaTriples_.emplace(*this);
 }
@@ -135,7 +136,7 @@ static auto lazyOptionalJoinOnFirstColumn(T1& leftInput, T2& rightInput,
   // There are 6 columns in the result (4 from the triple + graph ID, as well as
   // subject patterns of the subject and object).
   IdTable outputTable{NumColumnsIndexBuilding + 2,
-                      ad_utility::makeUnlimitedAllocator<Id>()};
+                      qlever::makeAllocator<Id>()};
   // The first argument is the number of join columns.
   auto rowAdder = ad_utility::AddCombinedRowToIdTable{
       1,
@@ -230,7 +231,7 @@ IndexImpl::buildOspWithPatterns(
         // Setup the callback for the join that will buffer the results and push
         // them to the queue.
         IdTable outputBufferTable{NumColumnsIndexBuilding + 2,
-                                  ad_utility::makeUnlimitedAllocator<Id>()};
+                                  qlever::makeAllocator<Id>()};
         auto pushToQueue = [&, bufferSize =
                                    BUFFER_SIZE_JOIN_PATTERNS_WITH_OSP().load()](
                                IdTable& table, LocalVocab&) {
@@ -873,7 +874,7 @@ auto IndexImpl::convertPartialToGlobalIds(
     auto idMap = std::make_shared<Map>(std::move(mapping));
 
     const size_t bufferSize = BUFFER_SIZE_PARTIAL_TO_GLOBAL_ID_MAPPINGS();
-    Buffer buffer{ad_utility::makeUnlimitedAllocator<Id>()};
+    Buffer buffer{qlever::makeAllocator<Id>()};
     buffer.reserve(bufferSize);
     auto pushBatch = [&buffer, &idMap, &lookupQueue, &getLookupTask,
                       bufferSize]() {

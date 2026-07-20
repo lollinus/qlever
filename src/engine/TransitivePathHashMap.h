@@ -16,6 +16,7 @@
 #include "engine/TransitivePathImpl.h"
 #include "engine/idTable/IdTable.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 
 // A set of edges of the implicit graph of a transitive path operation together
 // with the graph IRI of the source node of each edge. This is analogous to
@@ -27,10 +28,10 @@ class HashMapWrapper {
   // types are not exception safe.
   using Map = std::unordered_map<
       Id, Set, absl::Hash<Id>, std::equal_to<Id>,
-      ad_utility::AllocatorWithLimit<std::pair<const Id, Set>>>;
+      qlever::Allocator<std::pair<const Id, Set>>>;
   using MapOfMaps = std::unordered_map<
       Id, Map, absl::Hash<Id>, std::equal_to<Id>,
-      ad_utility::AllocatorWithLimit<std::pair<const Id, Map>>>;
+      qlever::Allocator<std::pair<const Id, Map>>>;
 
  private:
   // The map of maps mentioned above.
@@ -43,11 +44,11 @@ class HashMapWrapper {
 
  public:
   // Construct when there is no GRAPH clause.
-  HashMapWrapper(Map map, const ad_utility::AllocatorWithLimit<Id>& allocator);
+  HashMapWrapper(Map map, const qlever::Allocator<Id>& allocator);
 
   // Construct when there is a GRAPH clause.
   HashMapWrapper(MapOfMaps graphMap,
-                 const ad_utility::AllocatorWithLimit<Id>& allocator);
+                 const qlever::Allocator<Id>& allocator);
 
   // Return all target nodes for the given source node in the currently
   // active graph.

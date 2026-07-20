@@ -3,6 +3,7 @@
 // Author: Andre Schlegel (January of 2023, schlegea@informatik.uni-freiburg.de)
 
 #include "../test/util/IdTableHelpers.h"
+#include "util/Allocator.h"
 
 #include <algorithm>
 #include <utility>
@@ -250,7 +251,7 @@ std::shared_ptr<QueryExecutionTree> idTableToExecutionTree(
 // _____________________________________________________________________________
 std::pair<IdTable, std::vector<LocalVocab>> aggregateTables(
     Result::LazyResult generator, size_t numColumns) {
-  IdTable aggregateTable{numColumns, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable aggregateTable{numColumns, qlever::makeAllocator<Id>()};
   std::vector<LocalVocab> localVocabs;
   for (auto& [idTable, localVocab] : generator) {
     localVocabs.emplace_back(std::move(localVocab));

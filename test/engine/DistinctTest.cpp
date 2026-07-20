@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include "../util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "../util/IndexTestHelpers.h"
 #include "../util/OperationTestHelpers.h"
 #include "engine/Distinct.h"
@@ -193,7 +194,7 @@ TEST(Distinct, lazyWithLazyInputs) {
   idTables.push_back(makeIdTableFromVector(
       {{6, 1, 3, 6}, {2, 2, 3, 5}, {3, 6, 5, 4}, {1, 6, 5, 1}}));
   idTables.push_back(makeIdTableFromVector({{2, 6, 5, 2}}));
-  idTables.push_back(IdTable{4, ad_utility::makeUnlimitedAllocator<Id>()});
+  idTables.push_back(IdTable{4, qlever::makeAllocator<Id>()});
   idTables.push_back(makeIdTableFromVector(
       {{6, 7, 0, 6}, {2, 7, 1, 5}, {3, 7, 2, 4}, {1, 7, 3, 1}}));
   idTables.push_back(makeIdTableFromVector(

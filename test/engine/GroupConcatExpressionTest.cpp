@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include "../util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "../util/IdTableHelpers.h"
 #include "../util/IndexTestHelpers.h"
 #include "engine/sparqlExpressions/GroupConcatExpression.h"
@@ -52,7 +53,7 @@ void expectLiteralsAreConcatenatedTo(
     const ad_utility::triple_component::Literal& literal,
     ad_utility::source_location location = AD_CURRENT_SOURCE_LOC()) {
   LocalVocab localVocab;
-  IdTable input{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable input{1, qlever::makeAllocator<Id>()};
 
   for (const auto& inputLiteral : literals) {
     auto idx = localVocab.getIndexAndAddIfNotContained(

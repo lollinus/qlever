@@ -16,6 +16,7 @@
 #include <string>
 
 #include "engine/VariableToColumnMap.h"
+#include "util/Allocator.h"
 #include "global/Constants.h"
 #include "index/CompressedRelation.h"
 #include "index/IndexMetaData.h"
@@ -64,7 +65,7 @@ class Permutation {
   }
 
   using MetaData = IndexMetaData;
-  using Allocator = ad_utility::AllocatorWithLimit<Id>;
+  using Allocator = qlever::Allocator<Id>;
   using ColumnIndicesRef = CompressedRelationReader::ColumnIndicesRef;
   using ColumnIndices = CompressedRelationReader::ColumnIndices;
   using CancellationHandle = ad_utility::SharedCancellationHandle;

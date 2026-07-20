@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include "../util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "engine/GroupBy.h"
 #include "engine/GroupByImpl.h"
 #include "engine/LazyGroupBy.h"
@@ -21,8 +22,8 @@ auto I = ad_utility::testing::IntId;
 class LazyGroupByTest : public ::testing::Test {
  protected:
   // Unlimited allocator.
-  ad_utility::AllocatorWithLimit<Id> ua =
-      ad_utility::makeUnlimitedAllocator<Id>();
+  qlever::Allocator<Id> ua =
+      qlever::makeAllocator<Id>();
   QueryExecutionContext* qec_ = ad_utility::testing::getQec();
   // Initialize dummy instance of GroupBy to be used for testing. The actual
   // operations will never get executed because we manually test `LazyGroupBy`
@@ -40,7 +41,7 @@ class LazyGroupByTest : public ::testing::Test {
       std::make_shared<QueryExecutionTree>(
           qec_,
           std::make_shared<ValuesForTesting>(
-              qec_, IdTable{2, ad_utility::makeAllocatorWithLimit<Id>(0_B)},
+              qec_, IdTable{2, qlever::makeAllocatorWithLimit<Id>(0_B)},
               std::vector{std::optional{xVar_}, std::optional{yVar_}}));
 
   std::vector<GroupByImpl::Aggregate> aggregates_{
@@ -74,7 +75,7 @@ class LazyGroupByTest : public ::testing::Test {
 TEST_F(LazyGroupByTest, verifyEmptyGroupsAreAggregatedCorrectly) {
   IdTable resultTable{2, ua};
   GroupByImpl::GroupBlock block{{0, I(7)}};
-  IdTable idTable{1, ad_utility::makeAllocatorWithLimit<Id>(0_B)};
+  IdTable idTable{1, qlever::makeAllocatorWithLimit<Id>(0_B)};
   auto evaluationContext = makeEvaluationContext(idTable);
 
   lazyGroupBy_.processBlock(evaluationContext, 0, 0);
@@ -145,7 +146,7 @@ TEST(LazyGroupBy, verifyGroupConcatIsCorrectlyInitialized) {
       "SUM(?someVariable)"};
   auto subtree = std::make_shared<QueryExecutionTree>(
       qec, std::make_shared<ValuesForTesting>(
-               qec, IdTable{1, ad_utility::makeAllocatorWithLimit<Id>(0_B)},
+               qec, IdTable{1, qlever::makeAllocatorWithLimit<Id>(0_B)},
                std::vector{std::optional{variable}}));
   std::vector<GroupByImpl::Aggregate> aggregates{
       {std::move(sparqlExpression), 0}};

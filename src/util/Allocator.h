@@ -53,6 +53,12 @@ Allocator<T> makeAllocatorFromResource(std::pmr::memory_resource* resource) {
   return ad_utility::makePmrAllocatorFromResource<T>(resource);
 }
 
+// Create an allocator that enforces the given memory limit.
+template <typename T>
+Allocator<T> makeAllocatorWithLimit(ad_utility::MemorySize limit) {
+  return ad_utility::makePmrAllocatorWithLimit<T>(limit);
+}
+
 }  // namespace qlever
 
 #else  // LIMIT backend (default)
@@ -72,6 +78,12 @@ Allocator<T> makeAllocator() {
 template <typename T, typename... Args>
 Allocator<T> makeAllocator(Args&&... args) {
   return ad_utility::AllocatorWithLimit<T>{std::forward<Args>(args)...};
+}
+
+// Create an allocator that enforces the given memory limit.
+template <typename T>
+Allocator<T> makeAllocatorWithLimit(ad_utility::MemorySize limit) {
+  return ad_utility::makeAllocatorWithLimit<T>(limit);
 }
 
 }  // namespace qlever

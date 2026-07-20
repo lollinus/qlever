@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "engine/Operation.h"
+#include "util/Allocator.h"
 #include "engine/QueryExecutionTree.h"
 
 class Minus : public Operation {
@@ -59,7 +60,7 @@ class Minus : public Operation {
   template <typename IdTableT, typename T>
   IdTable copyMatchingRows(
       const IdTableT& left, T reference,
-      const std::vector<T, ad_utility::AllocatorWithLimit<T>>& keepEntry) const;
+      const std::vector<T, qlever::Allocator<T>>& keepEntry) const;
 
  public:
   size_t getCostEstimate() override;

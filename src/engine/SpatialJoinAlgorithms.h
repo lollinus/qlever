@@ -23,6 +23,7 @@
 #include <variant>
 
 #include "engine/Result.h"
+#include "util/Allocator.h"
 #include "engine/SpatialJoin.h"
 #include "util/GeoSparqlHelpers.h"
 
@@ -326,7 +327,7 @@ class SpatialJoinAlgorithms {
   size_t numFailedParsedGeometries_ = 0;
 
   // this vector stores the geometries, which have already been parsed
-  std::vector<AnyGeometry, ad_utility::AllocatorWithLimit<AnyGeometry>>
+  std::vector<AnyGeometry, qlever::Allocator<AnyGeometry>>
       geometries_;
 
   // After adding the given amount of rows to the WKT parser, it will be checked

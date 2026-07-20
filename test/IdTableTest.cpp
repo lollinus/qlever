@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "./util/AllocatorTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/GTestHelpers.h"
 #include "./util/IdTestHelpers.h"
 #include "engine/idTable/IdTable.h"
@@ -1158,22 +1159,25 @@ TEST(IdTable, shrinkToFit) {
   // necessary to change them if one of our used standard libraries has a
   // different behavior, but this is unlikely due to ABI stability goals between
   // library versions.
-  auto memory = ad_utility::makeAllocationMemoryLeftThreadsafeObject(1_kB);
-  IdTable table{2, ad_utility::AllocatorWithLimit<Id>{memory}};
   using namespace ad_utility::memory_literals;
-  ASSERT_EQ(memory.ptr().get()->wlock()->amountMemoryLeft(), 1_kB);
+  // Route through the allocator seam so this test runs under any backend; the
+  // remaining-memory counter is queried via the allocator itself (copies share
+  // the same underlying pool in both the `limit` and `pmr` backends).
+  auto allocator = qlever::makeAllocatorWithLimit<Id>(1_kB);
+  IdTable table{2, allocator};
+  ASSERT_EQ(allocator.amountMemoryLeft(), 1_kB);
   table.reserve(20);
   ASSERT_TRUE(table.empty());
   // 20 rows * 2 columns * 8 bytes per ID were allocated.
-  ASSERT_EQ(memory.ptr().get()->wlock()->amountMemoryLeft(), 680_B);
+  ASSERT_EQ(allocator.amountMemoryLeft(), 680_B);
   table.emplace_back();
   table.emplace_back();
   ASSERT_EQ(table.numRows(), 2u);
-  ASSERT_EQ(memory.ptr().get()->wlock()->amountMemoryLeft(), 680_B);
+  ASSERT_EQ(allocator.amountMemoryLeft(), 680_B);
   table.shrinkToFit();
   ASSERT_EQ(table.numRows(), 2u);
   // Now only 2 rows * 2 columns * 8 bytes were allocated.
-  ASSERT_EQ(memory.ptr().get()->wlock()->amountMemoryLeft(), 968_B);
+  ASSERT_EQ(allocator.amountMemoryLeft(), 968_B);
 }
 
 TEST(IdTable, staticAsserts) {
@@ -1204,7 +1208,7 @@ TEST(IdTable, constructorsAreSfinaeFriendly) {
 TEST(IdTable, addEmptyColumn) {
   using ::testing::ElementsAre;
   using ::testing::Eq;
-  IdTable table{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable table{1, qlever::makeAllocator<Id>()};
   table.push_back({V(1)});
   table.push_back({V(2)});
 
@@ -1219,7 +1223,7 @@ TEST(IdTable, addEmptyColumn) {
 
 // _____________________________________________________________________________
 TEST(IdTable, moveOrClone) {
-  IdTable table{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable table{1, qlever::makeAllocator<Id>()};
   table.push_back({V(1)});
   table.push_back({V(2)});
 
@@ -1233,7 +1237,7 @@ TEST(IdTable, moveOrClone) {
 
 // ______________________________________________________________________________
 TEST(IdTable, moveOrCloneOnView) {
-  IdTable table{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable table{1, qlever::makeAllocator<Id>()};
   table.push_back({V(1)});
   table.push_back({V(2)});
 
@@ -1259,7 +1263,7 @@ using SubViewTestTypes = testing::Types<IdTable, IdTableView<0>>;
 TYPED_TEST_SUITE(IdTableSubViewTest, SubViewTestTypes);
 
 TYPED_TEST(IdTableSubViewTest, subView) {
-  auto alloc = ad_utility::makeUnlimitedAllocator<Id>();
+  auto alloc = qlever::makeAllocator<Id>();
   IdTable table{2, alloc};
   for (int i = 0; i < 5; ++i) {
     table.push_back({V(i * 10), V(i * 10 + 1)});

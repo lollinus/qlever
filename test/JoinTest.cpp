@@ -13,6 +13,7 @@
 #include <tuple>
 
 #include "./util/AllocatorTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/GTestHelpers.h"
 #include "./util/IdTableHelpers.h"
 #include "./util/JoinHelpers.h"
@@ -698,7 +699,7 @@ TEST_P(JoinTestParametrized, joinTwoLazyOperationsWithAndWithoutUndefValues) {
   auto U = Id::makeUndefined();
   std::vector<IdTable> leftTables;
   std::vector<IdTable> rightTables;
-  IdTable expected1{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable expected1{1, qlever::makeAllocator<Id>()};
   performJoin(std::move(leftTables), std::move(rightTables), expected1, false);
 
   leftTables.push_back(makeIdTableFromVector({{U}}));
@@ -719,8 +720,8 @@ TEST_P(JoinTestParametrized, joinTwoLazyOperationsWithAndWithoutUndefValues) {
 
   leftTables.push_back(makeIdTableFromVector({{U}, {I(0)}}));
   leftTables.push_back(makeIdTableFromVector({{I(1)}}));
-  rightTables.push_back(IdTable{1, ad_utility::makeUnlimitedAllocator<Id>()});
-  IdTable expected5{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  rightTables.push_back(IdTable{1, qlever::makeAllocator<Id>()});
+  IdTable expected5{1, qlever::makeAllocator<Id>()};
   performJoin(std::move(leftTables), std::move(rightTables), expected5, false);
 
   leftTables.push_back(makeIdTableFromVector({{I(0)}}));
@@ -810,8 +811,8 @@ TEST_P(JoinTestParametrized,
   performJoin(makeIdTableFromVector({{I(0)}, {I(1)}}), std::move(rightTables),
               expected4, false);
 
-  rightTables.push_back(IdTable{1, ad_utility::makeUnlimitedAllocator<Id>()});
-  IdTable expected5{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  rightTables.push_back(IdTable{1, qlever::makeAllocator<Id>()});
+  IdTable expected5{1, qlever::makeAllocator<Id>()};
   performJoin(makeIdTableFromVector({{U}, {I(0)}, {I(1)}}),
               std::move(rightTables), expected5, false);
 

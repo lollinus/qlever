@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "DeltaTriplesTestHelpers.h"
+#include "util/Allocator.h"
 #include "engine/ExecuteUpdate.h"
 #include "engine/Load.h"
 #include "engine/QueryPlanner.h"
@@ -35,7 +36,7 @@ class LoadTest : public ::testing::Test {
   // see `IndexTestHelpers.h`. Note that `getQec` returns a pointer to a static
   // `QueryExecutionContext`, so no need to ever delete `testQec`.
   QueryExecutionContext* testQec = ad_utility::testing::getQec();
-  ad_utility::AllocatorWithLimit<Id> testAllocator =
+  qlever::Allocator<Id> testAllocator =
       ad_utility::testing::makeAllocator();
   ad_utility::BlankNodeManager blankNodeManager_;
 

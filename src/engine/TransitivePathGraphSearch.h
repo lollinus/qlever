@@ -17,11 +17,12 @@
 #include "engine/sparqlExpressions/SparqlExpressionTypes.h"
 #include "global/Id.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 #include "util/CancellationHandle.h"
 
 namespace qlever::graphSearch {
 using Set = std::unordered_set<Id, absl::Hash<Id>, std::equal_to<Id>,
-                               ad_utility::AllocatorWithLimit<Id>>;
+                               qlever::Allocator<Id>>;
 
 // Helper struct that combines all possible values necessary for the
 // graph search algorithms contained in this namespace. Improves
@@ -53,7 +54,7 @@ struct GraphSearchExecutionParams {
   // Used to communicate cancellation signals between objects.
   ad_utility::SharedCancellationHandle cancellationHandle_;
   // Used to allocate limited memory for new data structures.
-  const ad_utility::AllocatorWithLimit<Id>& allocator_;
+  const qlever::Allocator<Id>& allocator_;
 
   // Check if a signal to cancel computation was sent, and if yes, throw
   // a CancellationException containing info about the currently running

@@ -3,6 +3,7 @@
 // Author: Johannes Kalmbach <kalmbach@cs.uni-freiburg.de>
 
 #include "engine/ExistsJoin.h"
+#include "util/Allocator.h"
 
 #include "backports/three_way_comparison.h"
 #include "engine/CallFixedSize.h"
@@ -186,7 +187,7 @@ Result ExistsJoin::computeResult(bool requestLaziness) {
 
   // Store the indices of rows for which the value of the `EXISTS` (in the added
   // Boolean column) should be `false`.
-  std::vector<size_t, ad_utility::AllocatorWithLimit<size_t>> notExistsIndices{
+  std::vector<size_t, qlever::Allocator<size_t>> notExistsIndices{
       allocator()};
   // Helper lambda for computing the exists join with `callFixedSizeVi`, which
   // makes the number of join columns a template parameter.
@@ -343,7 +344,7 @@ std::optional<Result> ExistsJoin::tryRightIndexNestedLoopJoinIfSuitable(
       joinColumns_, std::move(leftRes), std::move(rightRes)};
   auto result = nestedLoopJoin.computeRightExistance(
       [this](auto&& idTable, LocalVocab localVocab,
-             const std::vector<bool, ad_utility::AllocatorWithLimit<bool>>&
+             const std::vector<bool, qlever::Allocator<bool>>&
                  matchingTracker) {
         IdTable resultTable = AD_FWD(idTable).moveOrClone();
         addExistsColumn(resultTable, matchingTracker);

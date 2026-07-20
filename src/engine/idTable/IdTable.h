@@ -20,6 +20,7 @@
 #include "global/Id.h"
 #include "util/Algorithm.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 #include "util/Iterators.h"
 #include "util/LambdaHelpers.h"
 #include "util/ResetWhenMoved.h"
@@ -896,7 +897,7 @@ class IdTable {
 
 namespace detail {
 using DefaultAllocator =
-    ad_utility::default_init_allocator<Id, ad_utility::AllocatorWithLimit<Id>>;
+    ad_utility::default_init_allocator<Id, qlever::Allocator<Id>>;
 using IdVector = std::vector<Id, DefaultAllocator>;
 }  // namespace detail
 

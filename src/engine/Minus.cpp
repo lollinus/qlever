@@ -3,6 +3,7 @@
 // Author: Florian Kramer (florian.kramer@netpun.uni-freiburg.de)
 
 #include "engine/Minus.h"
+#include "util/Allocator.h"
 
 #include "engine/CallFixedSize.h"
 #include "engine/JoinHelpers.h"
@@ -141,7 +142,7 @@ auto Minus::makeUndefRangesChecker(bool left,
 template <typename IdTableT, typename T>
 IdTable Minus::copyMatchingRows(
     const IdTableT& left, T reference,
-    const std::vector<T, ad_utility::AllocatorWithLimit<T>>& keepEntry) const {
+    const std::vector<T, qlever::Allocator<T>>& keepEntry) const {
   static_assert(IdTableLike<IdTableT>);
   IdTable result{getResultWidth(), left.getAllocator()};
   AD_CORRECTNESS_CHECK(result.numColumns() == left.numColumns());
@@ -283,7 +284,7 @@ std::optional<Result> Minus::tryRightIndexNestedLoopJoinIfSuitable(
       _matchedColumns, std::move(leftRes), std::move(rightRes)};
   auto result = nestedLoopJoin.computeRightExistance(
       [this](const auto& idTable, LocalVocab localVocab,
-             const std::vector<bool, ad_utility::AllocatorWithLimit<bool>>&
+             const std::vector<bool, qlever::Allocator<bool>>&
                  matchingTracker) {
         return Result::IdTableVocabPair{
             copyMatchingRows(idTable, false, matchingTracker),

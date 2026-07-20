@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "engine/SortPerformanceEstimator.h"
+#include "util/Allocator.h"
 #include "util/Log.h"
 #include "util/MemorySize/MemorySize.h"
 #include "util/Random.h"
@@ -17,8 +18,7 @@ using namespace ad_utility::memory_literals;
 
 TEST(SortPerformanceEstimator, TestManyEstimates) {
   // only allow the test to use 1 Gig of RAM
-  auto allocator = ad_utility::AllocatorWithLimit<Id>{
-      ad_utility::makeAllocationMemoryLeftThreadsafeObject(1_GB)};
+  auto allocator = qlever::makeAllocatorWithLimit<Id>(1_GB);
   auto t =
       SortPerformanceEstimator{allocator, std::numeric_limits<size_t>::max()};
 

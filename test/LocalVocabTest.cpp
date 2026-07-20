@@ -8,6 +8,7 @@
 #include <string>
 
 #include "./util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/TripleComponentTestHelpers.h"
 #include "backports/StartsWithAndEndsWith.h"
 #include "engine/Bind.h"
@@ -216,7 +217,7 @@ TEST(LocalVocab, merge) {
 // _____________________________________________________________________________
 TEST(LocalVocab, propagation) {
   // Query execution context (with small test index), see `IndexTestHelpers.h`.
-  using ad_utility::AllocatorWithLimit;
+  using qlever::Allocator;
   QueryExecutionContext* testQec = ad_utility::testing::getQec();
 
   // Lambda that checks the contents of the local vocabulary after the specified

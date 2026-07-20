@@ -11,6 +11,7 @@
 #include <unordered_map>
 
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 
 namespace ad_utility {
 // Wrapper for HashMaps to be used everywhere throughout code for the semantic
@@ -24,7 +25,7 @@ using HashMap = absl::flat_hash_map<Ts...>;
 // `AllocatorWithLimit` uses exceptions.
 template <class K, class V, class HashFct = absl::DefaultHashContainerHash<K>,
           class EqualElem = absl::DefaultHashContainerEq<K>,
-          class Alloc = ad_utility::AllocatorWithLimit<std::pair<const K, V>>>
+          class Alloc = qlever::Allocator<std::pair<const K, V>>>
 using HashMapWithMemoryLimit =
     std::unordered_map<K, V, HashFct, EqualElem, Alloc>;
 

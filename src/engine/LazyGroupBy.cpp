@@ -3,6 +3,7 @@
 //   Author: Robin Textor-Falconi <textorr@informatik.uni-freiburg.de>
 
 #include "engine/LazyGroupBy.h"
+#include "util/Allocator.h"
 
 using groupBy::detail::VectorOfAggregationData;
 
@@ -10,7 +11,7 @@ using groupBy::detail::VectorOfAggregationData;
 LazyGroupBy::LazyGroupBy(
     LocalVocab& localVocab,
     std::vector<GroupByImpl::HashMapAliasInformation> aggregateAliases,
-    const ad_utility::AllocatorWithLimit<Id>& allocator, size_t numGroupColumns)
+    const qlever::Allocator<Id>& allocator, size_t numGroupColumns)
     : localVocab_{localVocab},
       aggregateAliases_{std::move(aggregateAliases)},
       allocator_{allocator},

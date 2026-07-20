@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "../util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "../util/IndexTestHelpers.h"
 #include "../util/OperationTestHelpers.h"
 #include "./ValuesForTesting.h"
@@ -84,10 +85,10 @@ TEST(Bind, computeResult) {
 TEST(Bind, computeResultWithTableWithoutRows) {
   auto* qec = ad_utility::testing::getQec();
   Bind bind = makeBindForIdTable(
-      qec, IdTable{1, ad_utility::makeUnlimitedAllocator<Id>()});
+      qec, IdTable{1, qlever::makeAllocator<Id>()});
 
   expectBindYieldsIdTable(qec, bind,
-                          IdTable{2, ad_utility::makeUnlimitedAllocator<Id>()});
+                          IdTable{2, qlever::makeAllocator<Id>()});
 }
 
 // _____________________________________________________________________________
@@ -113,7 +114,7 @@ TEST(
   IdTable::row_type row{1};
   row[0] = val;
   auto* qec = ad_utility::testing::getQec();
-  IdTable table{1, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable table{1, qlever::makeAllocator<Id>()};
   table.resize(Bind::CHUNK_SIZE + 1);
   ql::ranges::fill(table, row);
   auto valuesTree = ad_utility::makeExecutionTree<ValuesForTesting>(

@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "backports/concepts.h"
+#include "util/Allocator.h"
 #include "engine/Result.h"
 #include "engine/idTable/IdTable.h"
 #include "engine/idTable/IdTableConcepts.h"
@@ -235,7 +236,7 @@ class AddCombinedRowToIdTable {
             resultTable_.numColumns() +
                 (static_cast<size_t>(!keepJoinColumns_) * numJoinColumns_) -
                 detail::toView(inputLeft).numColumns() + numJoinColumns_,
-            ad_utility::makeAllocatorWithLimit<Id>(0_B)}};
+            qlever::makeAllocatorWithLimit<Id>(0_B)}};
   }
 
   // The next free row in the output will be created from

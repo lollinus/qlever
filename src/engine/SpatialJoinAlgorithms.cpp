@@ -10,6 +10,7 @@
 // which can be found in the `LICENSE` file at the root of the QLever project.
 
 #include "engine/SpatialJoinAlgorithms.h"
+#include "util/Allocator.h"
 
 #include <s2/s2closest_edge_query.h>
 #include <s2/s2closest_point_query.h>
@@ -1054,7 +1055,7 @@ Result SpatialJoinAlgorithms::BoundingBoxAlgorithm() {
 
   // build rtree with one child
   bgi::rtree<Value, bgi::quadratic<16>, bgi::indexable<Value>,
-             bgi::equal_to<Value>, ad_utility::AllocatorWithLimit<Value>>
+             bgi::equal_to<Value>, qlever::Allocator<Value>>
       rtree(bgi::quadratic<16>{}, bgi::indexable<Value>{},
             bgi::equal_to<Value>{}, qec_->getAllocator());
   for (size_t i = 0; i < smallerResult->numRows(); i++) {
@@ -1074,7 +1075,7 @@ Result SpatialJoinAlgorithms::BoundingBoxAlgorithm() {
   }
 
   // query rtree with the other child
-  std::vector<Value, ad_utility::AllocatorWithLimit<Value>> results{
+  std::vector<Value, qlever::Allocator<Value>> results{
       qec_->getAllocator()};
   for (size_t i = 0; i < otherResult->numRows(); i++) {
     throwIfCancelled();

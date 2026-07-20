@@ -3,6 +3,7 @@
 //  Author: Johannes Kalmbach <kalmbach@cs.uni-freiburg.de>
 
 #include "IndexTestHelpers.h"
+#include "util/Allocator.h"
 
 #include "./GTestHelpers.h"
 #include "./TripleComponentTestHelpers.h"
@@ -20,7 +21,7 @@ namespace ad_utility::testing {
 
 // ______________________________________________________________
 Index makeIndexWithTestSettings(ad_utility::MemorySize parserBufferSize) {
-  Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index index{qlever::makeAllocator<Id>()};
   index.setNumTriplesPerBatch(2);
   EXTERNAL_ID_TABLE_SORTER_IGNORE_MEMORY_LIMIT_FOR_TESTING = true;
   // Decrease various default batch sizes such that there are multiple batches
@@ -237,7 +238,7 @@ Index makeTestIndex(const std::string& indexBasename, TestIndexConfig c) {
       throw std::runtime_error("The text index is not available in C++17 mode");
 #else
       TextIndexBuilder textIndexBuilder = TextIndexBuilder(
-          ad_utility::makeUnlimitedAllocator<Id>(), index.getOnDiskBase());
+          qlever::makeAllocator<Id>(), index.getOnDiskBase());
       // First test the case of invalid b and k parameters for BM25, it should
       // throw
       AD_EXPECT_THROW_WITH_MESSAGE(
@@ -291,7 +292,7 @@ Index makeTestIndex(const std::string& indexBasename, TestIndexConfig c) {
     // If we have no patterns, or only two permutations, then check the graceful
     // fallback even if the options were not explicitly specified during the
     // loading of the server.
-    Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+    Index index{qlever::makeAllocator<Id>()};
     index.usePatterns() = true;
     index.loadAllPermutations() = true;
     EXPECT_NO_THROW(index.createFromOnDiskIndex(indexBasename, false));
@@ -299,7 +300,7 @@ Index makeTestIndex(const std::string& indexBasename, TestIndexConfig c) {
     EXPECT_EQ(index.usePatterns(), c.usePatterns);
   }
 
-  Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index index{qlever::makeAllocator<Id>()};
   index.usePatterns() = c.usePatterns;
   index.loadAllPermutations() = c.loadAllPermutations;
   index.createFromOnDiskIndex(indexBasename, false);

@@ -5,6 +5,7 @@
 // UFR = University of Freiburg, Chair of Algorithms and Data Structures
 
 #include "libqlever/Qlever.h"
+#include "util/Allocator.h"
 
 #include <boost/optional.hpp>
 #include <functional>
@@ -75,7 +76,7 @@ Qlever::Qlever(const EngineConfig& config, Allocator<Id> allocator)
 
 // _____________________________________________________________________________
 void Qlever::buildIndex(IndexBuilderConfig config) {
-  Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index index{qlever::makeAllocator<Id>()};
 
   // Set memory limit and parser buffer size if specified.
   if (config.memoryLimit_.has_value()) {

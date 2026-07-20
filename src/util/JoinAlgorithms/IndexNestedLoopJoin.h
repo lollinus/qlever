@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "engine/CallFixedSize.h"
+#include "util/Allocator.h"
 #include "engine/JoinHelpers.h"
 #include "engine/Result.h"
 #include "engine/idTable/IdTable.h"
@@ -26,10 +27,10 @@ namespace detail {
 struct Filler {
   // Should conceptually be bool, but doesn't allow the compiler to use
   // memset in `matchLeft`.
-  std::vector<char, ad_utility::AllocatorWithLimit<char>> matchTracker_;
+  std::vector<char, qlever::Allocator<char>> matchTracker_;
 
   explicit Filler(size_t size,
-                  const ad_utility::AllocatorWithLimit<char>& allocator)
+                  const qlever::Allocator<char>& allocator)
       : matchTracker_(size, 0, allocator) {}
 
   AD_ALWAYS_INLINE void track(size_t offset, size_t size, size_t) {
@@ -42,10 +43,10 @@ struct Filler {
 // Helper class for `IndexNestedLoopJoin::matchLeft` that simply tracks which
 // rows from the right have found a match so far.
 struct RightFiller {
-  std::vector<bool, ad_utility::AllocatorWithLimit<bool>> matchTracker_;
+  std::vector<bool, qlever::Allocator<bool>> matchTracker_;
 
   explicit RightFiller(size_t size,
-                       const ad_utility::AllocatorWithLimit<bool>& allocator)
+                       const qlever::Allocator<bool>& allocator)
       : matchTracker_(size, false, allocator) {}
 
   AD_ALWAYS_INLINE void track(size_t, size_t size, size_t offset) {
@@ -61,13 +62,13 @@ struct Adder {
   std::vector<std::array<size_t, 2>> matchingPairs_;
   // Should conceptually be bool, but doesn't allow the compiler to use
   // memset in `matchLeft`.
-  std::vector<char, ad_utility::AllocatorWithLimit<char>> missingIndices_;
+  std::vector<char, qlever::Allocator<char>> missingIndices_;
   ad_utility::SharedCancellationHandle cancellationHandle_;
   size_t numJoinColumns_;
   bool keepJoinColumns_;
 
   explicit Adder(size_t size,
-                 const ad_utility::AllocatorWithLimit<char>& allocator,
+                 const qlever::Allocator<char>& allocator,
                  ad_utility::SharedCancellationHandle cancellationHandle,
                  size_t numJoinColumns, bool keepJoinColumns)
       : missingIndices_(size, true, allocator),
@@ -327,7 +328,7 @@ class IndexNestedLoopJoin {
 
   // Function for MINUS and EXISTS operations when the left side is fully
   // materialized.
-  std::vector<char, ad_utility::AllocatorWithLimit<char>>
+  std::vector<char, qlever::Allocator<char>>
   computeLeftExistance() {
     AD_CONTRACT_CHECK(leftResult_->isFullyMaterialized());
     detail::Filler matchTracker{

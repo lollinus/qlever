@@ -11,6 +11,7 @@
 #define QLEVER_SRC_INDEX_PATTERNCREATOR_H
 
 #include "engine/idTable/CompressedExternalIdTable.h"
+#include "util/Allocator.h"
 #include "global/Id.h"
 #include "global/Pattern.h"
 #include "index/ConstantsIndexBuilding.h"
@@ -136,10 +137,10 @@ class PatternCreator {
         tripleSorter_{
             std::make_unique<PSOSorter>(
                 filename_ + ".additionalTriples.pso.dat", memoryLimit / 2,
-                ad_utility::makeUnlimitedAllocator<Id>()),
+                qlever::makeAllocator<Id>()),
             std::make_unique<OSPSorter4Cols>(
                 filename_ + ".second-sorter.dat", memoryLimit / 2,
-                ad_utility::makeUnlimitedAllocator<Id>())},
+                qlever::makeAllocator<Id>())},
         idOfHasPattern_{idOfHasPattern} {
     AD_LOG_DEBUG << "Computing predicate patterns ..." << std::endl;
   }

@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "../test/PrefilterExpressionTestHelpers.h"
+#include "util/Allocator.h"
 #include "../util/GTestHelpers.h"
 #include "../util/IdTableHelpers.h"
 #include "../util/IndexTestHelpers.h"
@@ -43,7 +44,7 @@ void testLazyScan(
     const LimitOffsetClause& limitOffset = {},
     source_location l = AD_CURRENT_SOURCE_LOC()) {
   auto t = generateLocationTrace(l);
-  auto alloc = ad_utility::makeUnlimitedAllocator<Id>();
+  auto alloc = qlever::makeAllocator<Id>();
   IdTable lazyScanRes{0, alloc};
   size_t numBlocks = 0;
   for (const auto& block : partialLazyScanResult) {
@@ -646,7 +647,7 @@ TEST(IndexScan, computeResultCanBeConsumedLazily) {
 
   ASSERT_FALSE(result.isFullyMaterialized());
 
-  IdTable resultTable{3, ad_utility::makeUnlimitedAllocator<Id>()};
+  IdTable resultTable{3, qlever::makeAllocator<Id>()};
 
   for (Result::IdTableVocabPair& pair : result.idTables()) {
     resultTable.insertAtEnd(pair.idTable_);

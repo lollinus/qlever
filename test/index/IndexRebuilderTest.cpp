@@ -15,6 +15,7 @@
 #include <filesystem>
 
 #include "../util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "../util/HttpRequestHelpers.h"
 #include "../util/IdTableHelpers.h"
 #include "../util/IdTestHelpers.h"
@@ -466,7 +467,7 @@ TEST(IndexRebuilder, getNumberOfColumnsAndAdditionalColumns) {
 TEST(IndexRebuilder, createPermutationWriterTask) {
   auto* qec = ad_utility::testing::getQec("<a> <b> <c> . <d> <e> _:f .");
   const auto& index = qec->getIndex();
-  IndexImpl newIndex{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl newIndex{qlever::makeAllocator<Id>()};
   std::string prefix = gtestCurrentTestName();
   std::array<std::string_view, 4> suffixes{".index.pos", ".index.pos.meta",
                                            ".index.pso", ".index.pso.meta"};
@@ -549,7 +550,7 @@ TEST(IndexRebuilder, materializeToIndex) {
                                blankNodes, cancellationHandle, logFile);
     EXPECT_TRUE(std::filesystem::exists(logFile));
 
-    IndexImpl newIndex{ad_utility::makeUnlimitedAllocator<Id>()};
+    IndexImpl newIndex{qlever::makeAllocator<Id>()};
     newIndex.usePatterns() = usePatterns;
     newIndex.loadAllPermutations() = loadAllPermutations;
     newIndex.createFromOnDiskIndex(newIndexName, false);
@@ -587,7 +588,7 @@ TEST(IndexRebuilder, materializeToIndexWithZeroMemorySourceIndex) {
                                      "<a> <b> <c> . <d> <e> _:f .");
 
   // Load the source index with a zero-memory allocator.
-  Index index{ad_utility::makeAllocatorWithLimit<Id>(0_B)};
+  Index index{qlever::makeAllocatorWithLimit<Id>(0_B)};
   index.createFromOnDiskIndex(sourceIndexName, false);
 
   index.deltaTriplesManager().modify<void>(
@@ -614,7 +615,7 @@ TEST(IndexRebuilder, materializeToIndexWithZeroMemorySourceIndex) {
                                              state, vocab, blankNodes,
                                              cancellationHandle, logFile));
 
-  IndexImpl newIndex{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl newIndex{qlever::makeAllocator<Id>()};
   newIndex.createFromOnDiskIndex(newIndexName, false);
   EXPECT_EQ(newIndex.numTriples().normal, 3);
 }

@@ -13,6 +13,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "engine/MaterializedViewsQueryAnalysis.h"
+#include "util/Allocator.h"
 #include "engine/VariableToColumnMap.h"
 #include "engine/idTable/CompressedExternalIdTable.h"
 #include "index/DeltaTriples.h"
@@ -53,7 +54,7 @@ class MaterializedViewWriter {
   // Memory limit and allocator for `CompressedExternalIdTableSorter`, which is
   // used if the query result is not correctly sorted.
   ad_utility::MemorySize memoryLimit_;
-  ad_utility::AllocatorWithLimit<Id> allocator_;
+  qlever::Allocator<Id> allocator_;
 
   // The correctly ordered column names of the view.
   std::vector<Variable> columnNames_;
@@ -82,7 +83,7 @@ class MaterializedViewWriter {
   MaterializedViewWriter(std::string onDiskBase, std::string name,
                          const PlannedQuery& plannedQuery,
                          ad_utility::MemorySize memoryLimit,
-                         ad_utility::AllocatorWithLimit<Id> allocator);
+                         qlever::Allocator<Id> allocator);
 
   // Get the base filename for the view's permutation and metadata files. This
   // name is the result of concatenating `onDiskBase` and `name`.
@@ -149,7 +150,7 @@ class MaterializedView : public std::enable_shared_from_this<MaterializedView> {
   std::string onDiskBase_;
   std::string name_;
   std::shared_ptr<Permutation> permutation_{std::make_shared<Permutation>(
-      Permutation::Enum::SPO, ad_utility::makeUnlimitedAllocator<Id>(), name_)};
+      Permutation::Enum::SPO, qlever::makeAllocator<Id>(), name_)};
   VariableToColumnMap varToColMap_;
   std::shared_ptr<LocatedTriplesState> locatedTriplesState_;
   std::optional<std::string> originalQuery_;
@@ -332,8 +333,8 @@ class MaterializedViewsManager {
   void writeViewToDisk(
       std::string name, const qlever::PlannedQuery& plannedQuery,
       ad_utility::MemorySize memoryLimit = ad_utility::MemorySize::gigabytes(4),
-      ad_utility::AllocatorWithLimit<Id> allocator =
-          ad_utility::makeUnlimitedAllocator<Id>()) const;
+      qlever::Allocator<Id> allocator =
+          qlever::makeAllocator<Id>()) const;
 };
 
 #endif  // QLEVER_SRC_ENGINE_MATERIALIZEDVIEWS_H_

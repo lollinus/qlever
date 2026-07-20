@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "../QueryPlannerTestHelpers.h"
+#include "util/Allocator.h"
 #include "../SparqlExpressionTestHelpers.h"
 #include "../util/RuntimeParametersTestHelpers.h"
 #include "../util/TripleComponentTestHelpers.h"
@@ -108,7 +109,7 @@ TEST(SparqlExpressionParser, First) {
   auto resultAsExpression = std::move(resultofParse.resultOfParse_);
 
   VariableToColumnMap map;
-  ad_utility::AllocatorWithLimit<Id> alloc{
+  qlever::Allocator<Id> alloc{
       ad_utility::testing::makeAllocator()};
   IdTable table{alloc};
   LocalVocab localVocab;

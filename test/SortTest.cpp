@@ -12,6 +12,7 @@
 #include <gtest/gtest.h>
 
 #include "./util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "./util/RuntimeParametersTestHelpers.h"
 #include "engine/Sort.h"
 #include "engine/ValuesForTesting.h"
@@ -223,7 +224,7 @@ TEST(Sort, verifyOperationIsPreemptivelyAbortedWithNoRemainingTime) {
   const_cast<SortPerformanceEstimator&>(
       sort.getExecutionContext()->getSortPerformanceEstimator())
       .computeEstimatesExpensively(
-          ad_utility::makeUnlimitedAllocator<ValueId>(), 1'000'000);
+          qlever::makeAllocator<ValueId>(), 1'000'000);
 
   sort.recursivelySetTimeConstraint(0ms);
 

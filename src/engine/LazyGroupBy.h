@@ -6,6 +6,7 @@
 #define QLEVER_SRC_ENGINE_LAZYGROUPBY_H
 
 #include "engine/GroupByImpl.h"
+#include "util/Allocator.h"
 
 // Helper class to lazily compute the result of a group by operation. It makes
 // use of the hash map optimization to store the intermediate results of the
@@ -13,14 +14,14 @@
 class LazyGroupBy {
   LocalVocab& localVocab_;
   std::vector<GroupByImpl::HashMapAliasInformation> aggregateAliases_;
-  const ad_utility::AllocatorWithLimit<Id>& allocator_;
+  const qlever::Allocator<Id>& allocator_;
   GroupByImpl::HashMapAggregationData<0> aggregationData_;
 
  public:
   LazyGroupBy(
       LocalVocab& localVocab,
       std::vector<GroupByImpl::HashMapAliasInformation> aggregateAliases,
-      const ad_utility::AllocatorWithLimit<Id>& allocator,
+      const qlever::Allocator<Id>& allocator,
       size_t numGroupColumns);
 
   // Delete copy and move functions to avoid unexpected behavior.

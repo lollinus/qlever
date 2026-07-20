@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "./util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "./util/IdTestHelpers.h"
 #include "engine/OrderBy.h"
 #include "engine/ValuesForTesting.h"
@@ -250,7 +251,7 @@ TEST(OrderBy, verifyOperationIsPreemptivelyAbortedWithNoRemainingTime) {
   const_cast<SortPerformanceEstimator&>(
       orderBy.getExecutionContext()->getSortPerformanceEstimator())
       .computeEstimatesExpensively(
-          ad_utility::makeUnlimitedAllocator<ValueId>(), 1'000'000);
+          qlever::makeAllocator<ValueId>(), 1'000'000);
 
   orderBy.recursivelySetTimeConstraint(0ms);
 

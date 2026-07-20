@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "./util/IdTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/IndexTestHelpers.h"
 #include "engine/QueryExecutionTree.h"
 #include "engine/TransitivePathBase.h"
@@ -1956,7 +1957,7 @@ TEST(TransitivePathBinSearch, successorsWithGraph) {
 namespace {
 // _____________________________________________________________________________
 HashMapWrapper::MapOfMaps columnsToMap(
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     ql::span<const Id> startCol, ql::span<const Id> targetCol,
     ql::span<const Id> graphCol) {
   HashMapWrapper::MapOfMaps edgesWithGraph{allocator};
@@ -1970,7 +1971,7 @@ HashMapWrapper::MapOfMaps columnsToMap(
 
 // _____________________________________________________________________________
 HashMapWrapper::Map columnsToMap(
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     ql::span<const Id> startCol, ql::span<const Id> targetCol) {
   HashMapWrapper::Map edges{allocator};
 

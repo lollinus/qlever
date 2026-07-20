@@ -9,6 +9,7 @@
 #include <set>
 
 #include "./util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "util/IdTableHelpers.h"
 #include "util/JoinAlgorithms/JoinAlgorithms.h"
 #include "util/TransparentFunctors.h"
@@ -810,7 +811,7 @@ void testSpecialOptionalJoinWithSplits(
 TEST(JoinAlgorithms, SpecialOptionalJoinEmptyInputs) {
   testSpecialOptionalJoin({}, {}, {});
 
-  auto emptyTable = IdTable(3, makeUnlimitedAllocator<Id>());
+  auto emptyTable = IdTable(3, qlever::makeAllocator<Id>());
   auto nonEmpty = makeIdTableFromVector({{I(13), I(0), I(100)}});
   testSpecialOptionalJoin(makeVec(nonEmpty), makeVec(emptyTable),
                           {{I(13), I(0), I(100), Id::makeUndefined()}});

@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "engine/Result.h"
+#include "util/Allocator.h"
 #include "util/IdTableHelpers.h"
 #include "util/IndexTestHelpers.h"
 
@@ -33,7 +34,7 @@ std::vector<Result::Generator> getAllSubSplits(const IdTable& idTable) {
     }
     result.push_back([](auto split, IdTable clone) -> Result::Generator {
       IdTable subSplit{clone.numColumns(),
-                       ad_utility::makeUnlimitedAllocator<IdTable>()};
+                       qlever::makeAllocator<IdTable>()};
       size_t splitIndex = 0;
       for (size_t i = 0; i < clone.size(); ++i) {
         subSplit.push_back(clone[i]);
@@ -119,11 +120,11 @@ TEST(Result, verifyIdTableThrowsOnSecondAccess) {
 // _____________________________________________________________________________
 TEST(Result, verifyIdTablesThrowsWhenFullyMaterialized) {
   Result result1{
-      IdTable{ad_utility::makeUnlimitedAllocator<IdTable>()}, {}, LocalVocab{}};
+      IdTable{qlever::makeAllocator<IdTable>()}, {}, LocalVocab{}};
   EXPECT_TRUE(result1.isFullyMaterialized());
   EXPECT_THROW(result1.idTables(), ad_utility::Exception);
 
-  Result result2{IdTable{ad_utility::makeUnlimitedAllocator<IdTable>()},
+  Result result2{IdTable{qlever::makeAllocator<IdTable>()},
                  {},
                  result1.getSharedLocalVocab()};
   EXPECT_TRUE(result2.isFullyMaterialized());
@@ -398,10 +399,10 @@ TEST(Result, verifyCacheDuringConsumptionRespectsPassedParameters) {
 TEST(Result, cacheDuringConsumptionAbortsValueWhenRunningIntoMemoryLimit) {
   bool flag = false;
   Result result{[](bool& innerFlag) -> Result::Generator {
-                  co_yield {IdTable{1, ad_utility::makeAllocatorWithLimit<Id>(
+                  co_yield {IdTable{1, qlever::makeAllocatorWithLimit<Id>(
                                            ad_utility::MemorySize::bytes(0))},
                             LocalVocab{}};
-                  IdTable idTable{1, ad_utility::makeUnlimitedAllocator<Id>()};
+                  IdTable idTable{1, qlever::makeAllocator<Id>()};
                   idTable.push_back({Id::makeFromBool(true)});
                   co_yield {std::move(idTable), LocalVocab{}};
                   innerFlag = true;
@@ -423,7 +424,7 @@ TEST(
   bool flag = false;
   Result result{[](bool& innerFlag) -> Result::Generator {
                   IdTable idTable{
-                      1, ad_utility::makeAllocatorWithLimit<Id>(
+                      1, qlever::makeAllocatorWithLimit<Id>(
                              ad_utility::MemorySize::bytes(1) * sizeof(Id))};
                   idTable.push_back({Id::makeFromBool(true)});
                   co_yield {std::move(idTable), LocalVocab{}};

@@ -3,6 +3,7 @@
 // Author: Felix Meisen (fesemeisen@outlook.de)
 
 #include "index/TextIndexReadWrite.h"
+#include "util/Allocator.h"
 
 #include "index/TextScoringEnum.h"
 
@@ -11,7 +12,7 @@ namespace textIndexReadWrite::detail {
 
 // _____________________________________________________________________________
 IdTable readContextListHelper(
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     const ContextListMetaData& contextList, bool isWordCl,
     const ad_utility::File& textIndexFile,
     TextScoringMetric textScoringMetric) {
@@ -155,7 +156,7 @@ void encodeAndWriteSpanAndMoveOffset(ql::span<const T> spanToWrite,
 
 // ____________________________________________________________________________
 IdTable readWordCl(const TextBlockMetaData& tbmd,
-                   const ad_utility::AllocatorWithLimit<Id>& allocator,
+                   const qlever::Allocator<Id>& allocator,
                    const ad_utility::File& textIndexFile,
                    TextScoringMetric textScoringMetric) {
   return detail::readContextListHelper(allocator, tbmd._cl, true, textIndexFile,
@@ -164,7 +165,7 @@ IdTable readWordCl(const TextBlockMetaData& tbmd,
 
 // ____________________________________________________________________________
 IdTable readWordEntityCl(const TextBlockMetaData& tbmd,
-                         const ad_utility::AllocatorWithLimit<Id>& allocator,
+                         const qlever::Allocator<Id>& allocator,
                          const ad_utility::File& textIndexFile,
                          TextScoringMetric textScoringMetric) {
   return detail::readContextListHelper(allocator, tbmd._entityCl, false,

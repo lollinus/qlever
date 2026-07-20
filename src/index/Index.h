@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "backports/three_way_comparison.h"
+#include "util/Allocator.h"
 #include "global/Id.h"
 #include "index/GraphNameManager.h"
 #include "index/InputFileSpecification.h"
@@ -83,7 +84,7 @@ class Index {
   /// Allow move construction, which is mostly used in unit tests.
   Index(Index&&) noexcept;
 
-  explicit Index(ad_utility::AllocatorWithLimit<Id> allocator);
+  explicit Index(qlever::Allocator<Id> allocator);
   ~Index();
 
   // Get underlying access to the Pimpl where necessary.
@@ -162,11 +163,11 @@ class Index {
 
   IdTable getWordPostingsForTerm(
       const std::string& term,
-      const ad_utility::AllocatorWithLimit<Id>& allocator) const;
+      const qlever::Allocator<Id>& allocator) const;
 
   IdTable getEntityMentionsForWord(
       const std::string& term,
-      const ad_utility::AllocatorWithLimit<Id>& allocator) const;
+      const qlever::Allocator<Id>& allocator) const;
 
   size_t getIndexOfBestSuitedElTerm(
       const std::vector<std::string>& terms) const;

@@ -5,6 +5,7 @@
 #include <gmock/gmock.h>
 
 #include "./PrefilterExpressionTestHelpers.h"
+#include "util/Allocator.h"
 #include "engine/Filter.h"
 #include "engine/IndexScan.h"
 #include "engine/ValuesForTesting.h"
@@ -75,7 +76,7 @@ TEST(Filter, verifyPredicateIsAppliedCorrectlyOnLazyEvaluation) {
   idTables.push_back(makeIdTableFromVector(
       {{true}, {true}, {false}, {false}, {true}}, asBool));
   idTables.push_back(makeIdTableFromVector({{true}, {false}}, asBool));
-  idTables.push_back(IdTable{1, ad_utility::makeUnlimitedAllocator<Id>()});
+  idTables.push_back(IdTable{1, qlever::makeAllocator<Id>()});
   idTables.push_back(
       makeIdTableFromVector({{false}, {false}, {false}}, asBool));
   idTables.push_back(makeIdTableFromVector({{true}}, asBool));
@@ -147,7 +148,7 @@ TEST(Filter,
   idTables.push_back(makeIdTableFromVector(
       {{true}, {true}, {false}, {false}, {true}}, asBool));
   idTables.push_back(makeIdTableFromVector({{true}, {false}}, asBool));
-  idTables.push_back(IdTable{1, ad_utility::makeUnlimitedAllocator<Id>()});
+  idTables.push_back(IdTable{1, qlever::makeAllocator<Id>()});
   idTables.push_back(
       makeIdTableFromVector({{false}, {false}, {false}}, asBool));
   idTables.push_back(makeIdTableFromVector({{true}}, asBool));

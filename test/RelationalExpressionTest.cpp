@@ -8,6 +8,7 @@
 #include <string>
 
 #include "./SparqlExpressionTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/AllocatorTestHelpers.h"
 #include "./util/GTestHelpers.h"
 #include "./util/TripleComponentTestHelpers.h"
@@ -490,7 +491,7 @@ auto testNotComparableHelper(T leftValue, U rightValue,
                              source_location l = AD_CURRENT_SOURCE_LOC()) {
   auto trace = generateLocationTrace(
       l, "testLessThanGreaterThanEqualMultipleValuesHelper was called here");
-  ad_utility::AllocatorWithLimit<Id> alloc{makeAllocator()};
+  qlever::Allocator<Id> alloc{makeAllocator()};
   VariableToColumnMap map;
   LocalVocab localVocab;
   IdTable table{alloc};

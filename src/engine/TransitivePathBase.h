@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "backports/functional.h"
+#include "util/Allocator.h"
 #include "engine/Operation.h"
 #include "engine/QueryExecutionTree.h"
 
@@ -79,11 +80,11 @@ struct TransitivePathSide {
 // We deliberately use the `std::` variants of a hash set because `absl`s types
 // are not exception safe.
 using Set = std::unordered_set<Id, absl::Hash<Id>, std::equal_to<Id>,
-                               ad_utility::AllocatorWithLimit<Id>>;
+                               qlever::Allocator<Id>>;
 using SetWithGraph =
     std::unordered_set<std::pair<Id, Id>, absl::Hash<std::pair<Id, Id>>,
                        std::equal_to<std::pair<Id, Id>>,
-                       ad_utility::AllocatorWithLimit<std::pair<Id, Id>>>;
+                       qlever::Allocator<std::pair<Id, Id>>>;
 
 // Alias for common type
 using PayloadTable = std::optional<IdTableView<0>>;

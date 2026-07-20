@@ -9,6 +9,7 @@
 // which can be found in the `LICENSE` file at the root of the QLever project.
 
 #include "index/LocatedTriples.h"
+#include "util/Allocator.h"
 
 #include "backports/algorithm.h"
 #include "global/RuntimeParameters.h"
@@ -352,8 +353,8 @@ TriplesToVacuum LocatedTriplesPerBlock::identifyTriplesToVacuum(
     // This is one past the last block with index triples. This block always
     // only has updates but no index triples. Pass in an empty `IdTable`.
     if (blockIndex == blockMetadata.size()) {
-      ad_utility::AllocatorWithLimit<Id> allocator =
-          ad_utility::makeAllocatorWithLimit<Id>(0_B);
+      qlever::Allocator<Id> allocator =
+          qlever::makeAllocatorWithLimit<Id>(0_B);
       IdTable idTable(4, allocator);
       totalStats +=
           processBlockForVacuum(idTable, map_.at(blockIndex), inverseKeys,

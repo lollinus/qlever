@@ -9,6 +9,7 @@
 #define QLEVER_SRC_INDEX_COMPRESSEDRELATIONPERMUTATIONWRITERIMPL_H_
 
 #include "engine/idTable/CompressedExternalIdTable.h"
+#include "util/Allocator.h"
 #include "index/CompressedRelation.h"
 #include "index/CompressedRelationHelpersImpl.h"
 #include "util/ProgressBar.h"
@@ -111,8 +112,8 @@ struct CompressedRelationWriter::PermutationWriter {
   IfPair<ad_utility::Timer> largeTwinRelationTimer_;
 
   std::optional<Id> col0IdCurrentRelation_;
-  ad_utility::AllocatorWithLimit<ValueId> alloc_{
-      ad_utility::makeUnlimitedAllocator<Id>()};
+  qlever::Allocator<ValueId> alloc_{
+      qlever::makeAllocator<Id>()};
 
   // TODO<joka921> Use call_fixed_size if there is benefit to it.
   IdTable relation_{numColumns_, alloc_};

@@ -17,6 +17,7 @@
 #include "engine/VariableToColumnMap.h"
 #include "util/Algorithm.h"
 #include "util/AllocatorWithLimit.h"
+#include "util/Allocator.h"
 
 using namespace pathSearch;
 
@@ -337,11 +338,11 @@ PathsLimited PathSearch::findPaths(
   Path currentPath{EdgesLimited(allocator())};
   std::unordered_map<
       uint64_t, uint64_t, std::hash<uint64_t>, std::equal_to<uint64_t>,
-      ad_utility::AllocatorWithLimit<std::pair<const uint64_t, uint64_t>>>
+      qlever::Allocator<std::pair<const uint64_t, uint64_t>>>
       numPathsPerNode{allocator()};
   PathsLimited result{allocator()};
   std::unordered_set<uint64_t, std::hash<uint64_t>, std::equal_to<uint64_t>,
-                     ad_utility::AllocatorWithLimit<uint64_t>>
+                     qlever::Allocator<uint64_t>>
       visited{allocator()};
 
   visited.insert(source.getBits());

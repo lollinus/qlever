@@ -10,6 +10,7 @@
 #include <string>
 
 #include "./SparqlExpressionTestHelpers.h"
+#include "util/Allocator.h"
 #include "./printers/LocalVocabEntryPrinters.h"
 #include "./util/GTestHelpers.h"
 #include "./util/RuntimeParametersTestHelpers.h"
@@ -104,8 +105,8 @@ auto geoLit = [](std::string_view content) {
 // Test allocator (the inputs to our `SparqlExpression`s are
 // `VectorWithMemoryLimit`s, and these require an `AllocatorWithLimit`).
 //
-using ad_utility::AllocatorWithLimit;
-AllocatorWithLimit<Id> alloc = ad_utility::testing::makeAllocator();
+using qlever::Allocator;
+Allocator<Id> alloc = ad_utility::testing::makeAllocator();
 
 // A concept for a type that is either a `SingleExpressionResult`, a
 // `std::vector<T>` where `T` is a `SingleExpressionResult` or something that
@@ -208,7 +209,7 @@ auto testNaryExpressionImpl = [](auto&& makeExpression, auto const& expected,
                                  auto const&... operands) {
   CPP_assert(SingleExpressionResult<decltype(expected)> &&
              (SingleExpressionResult<decltype(operands)> && ...));
-  ad_utility::AllocatorWithLimit<Id> alloc{
+  qlever::Allocator<Id> alloc{
       ad_utility::testing::makeAllocator()};
   VariableToColumnMap map;
   LocalVocab localVocab;

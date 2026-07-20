@@ -12,6 +12,7 @@
 #include <fstream>
 
 #include "./util/GTestHelpers.h"
+#include "util/Allocator.h"
 #include "./util/IdTableHelpers.h"
 #include "./util/TripleComponentTestHelpers.h"
 #include "CompilationInfo.h"
@@ -475,7 +476,7 @@ auto IsPossiblyExternalString = [](const TripleComponent& content,
 
 TEST(IndexTest, processTriple) {
   {
-    IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+    IndexImpl index{qlever::makeAllocator<Id>()};
     TurtleTriple turtleTriple{iri("<subject>"), iri("<predicate>"),
                               lit("\"literal\"")};
     ProcessedTriple result = index.processTriple(std::move(turtleTriple));
@@ -488,7 +489,7 @@ TEST(IndexTest, processTriple) {
                 IsPossiblyExternalString(lit("\"literal\""), true));
   }
   {
-    IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+    IndexImpl index{qlever::makeAllocator<Id>()};
     index.getNonConstVocabForTesting().initializeExternalizePrefixes(
         std::vector{"<subj"s});
     TurtleTriple turtleTriple{iri("<subject>"), iri("<predicate>"),
@@ -504,7 +505,7 @@ TEST(IndexTest, processTriple) {
                 IsPossiblyExternalString(lit("\"literal\"", "@fr"), true));
   }
   {
-    IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+    IndexImpl index{qlever::makeAllocator<Id>()};
     TurtleTriple turtleTriple{iri("<subject>"), iri("<predicate>"), 42.0};
     ProcessedTriple result = index.processTriple(std::move(turtleTriple));
     EXPECT_EQ(Id::makeFromDouble(42.0),
@@ -514,7 +515,7 @@ TEST(IndexTest, processTriple) {
 
 // _____________________________________________________________________________
 TEST(IndexTest, ZeroCopyVocabularyBlob) {
-  IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl index{qlever::makeAllocator<Id>()};
   auto& vocab = index.getNonConstVocabForTesting();
   vocab.resetToType(ad_utility::VocabularyType{
       ad_utility::VocabularyType::Enum::InMemoryUncompressed});
@@ -528,7 +529,7 @@ TEST(IndexTest, ZeroCopyVocabularyBlob) {
 
   ad_utility::serialization::AlignedByteBufferReadSerializer readSerializer{
       std::move(writeSerializer).data()};
-  IndexImpl otherIndex{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl otherIndex{qlever::makeAllocator<Id>()};
   otherIndex.loadVocabularyFromZeroCopyBlob(readSerializer);
 
   const auto& readVocab = otherIndex.getVocab();
@@ -626,7 +627,7 @@ TEST(IndexTest, getPermutation) {
 }
 
 TEST(IndexTest, trivialGettersAndSetters) {
-  Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index index{qlever::makeAllocator<Id>()};
   index.memoryLimitIndexBuilding() = 7_kB;
   EXPECT_EQ(index.memoryLimitIndexBuilding(), 7_kB);
   EXPECT_EQ(std::as_const(index).memoryLimitIndexBuilding(), 7_kB);
@@ -735,7 +736,7 @@ TEST(IndexTest, getBlankNodeManager) {
   // The `blankNodeManager_` is initialized after initializing the Index itself.
   // Therefore we expect a throw when the getter is called by an
   // uninitialized Index.
-  Index index{ad_utility::makeUnlimitedAllocator<Id>()};
+  Index index{qlever::makeAllocator<Id>()};
   EXPECT_ANY_THROW(index.getBlankNodeManager());
 
   // Index is initialized -> no throw
@@ -793,7 +794,7 @@ TEST(IndexImpl, recomputeStatistics) {
     if (!loadAllPermutations) {
       // Overwrite with unloaded permutation.
       indexImpl.SPOForTesting() = Permutation{
-          Permutation::SPO, ad_utility::makeUnlimitedAllocator<Id>()};
+          Permutation::SPO, qlever::makeAllocator<Id>()};
       // Zero out original values.
       indexImpl.configurationJson_["num-subjects"] = NNAI(0, 0);
       indexImpl.configurationJson_["num-objects"] = NNAI(0, 0);
@@ -830,7 +831,7 @@ TEST(IndexImpl, countDistinct) {
 
 // _____________________________________________________________________________
 TEST(IndexImpl, createPermutation) {
-  IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl index{qlever::makeAllocator<Id>()};
   auto [directory, cleanup] = makeTemporaryDirectory("createPermutation");
   auto onDiskBase = directory + "/index";
   index.setOnDiskBase(onDiskBase);
@@ -841,7 +842,7 @@ TEST(IndexImpl, createPermutation) {
       makeIdTableFromVector({{2, 4, 1, 0}, {2, 5, 1, 0}, {3, 6, 1, 0}}));
 
   Permutation permutation{Permutation::PSO,
-                          ad_utility::makeUnlimitedAllocator<Id>()};
+                          qlever::makeAllocator<Id>()};
   auto [uniquePredicates, meta] = index.createPermutationWithoutMetadata(
       4,
       ad_utility::InputRangeTypeErased{std::array<IdTableStatic<0>, 2>{
@@ -895,7 +896,7 @@ TEST(IndexImpl, createPermutation) {
 
 // _____________________________________________________________________________
 TEST(IndexImpl, writePatternsToFile) {
-  IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl index{qlever::makeAllocator<Id>()};
   auto [directory, cleanup] = makeTemporaryDirectory("writePatternsToFile");
   auto onDiskBase = directory + "/index";
   index.setOnDiskBase(onDiskBase);
@@ -936,7 +937,7 @@ TEST(IndexImpl, writePatternsToFile) {
 TEST(IndexImpl, loadConfigFromOldIndex) {
   auto [directory, cleanup] = makeTemporaryDirectory("loadConfigFromOldIndex");
   auto onDiskBase = directory + "/index";
-  IndexImpl other{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl other{qlever::makeAllocator<Id>()};
   other.blocksizePermutationPerColumn() = 1337_B;
   nlohmann::json stats;
 
@@ -951,7 +952,7 @@ TEST(IndexImpl, loadConfigFromOldIndex) {
   stats["num-objects"] = numObjects;
   stats["i-just-invented-this"] = "🤠";
 
-  IndexImpl index{ad_utility::makeUnlimitedAllocator<Id>()};
+  IndexImpl index{qlever::makeAllocator<Id>()};
   index.loadConfigFromOldIndex(onDiskBase, other, stats);
   EXPECT_EQ(index.getOnDiskBase(), onDiskBase);
   EXPECT_EQ(index.getKbName(), other.getKbName());

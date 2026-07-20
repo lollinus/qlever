@@ -6,6 +6,7 @@
 // Copyright 2025, Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
 
 #include "engine/GroupByImpl.h"
+#include "util/Allocator.h"
 
 #include <absl/strings/str_join.h>
 
@@ -216,7 +217,7 @@ class LazyGroupByRange
     // still missing. We have to setup a dummy input table and evaluation
     // context, that have the values of the `currentGroupBlock` in the
     // correct columns.
-    IdTable idTable{inWidth_, ad_utility::makeAllocatorWithLimit<Id>(
+    IdTable idTable{inWidth_, qlever::makeAllocatorWithLimit<Id>(
                                   1_B * sizeof(Id) * inWidth_)};
     idTable.emplace_back();
     for (const auto& [colIdx, value] : currentGroupBlock_) {
@@ -721,7 +722,7 @@ void GroupByImpl::processEmptyImplicitGroup(
     IdTable& resultTable, const std::vector<Aggregate>& aggregates,
     LocalVocab* localVocab) const {
   size_t inWidth = _subtree->getResultWidth();
-  IdTable idTable{inWidth, ad_utility::makeAllocatorWithLimit<Id>(0_B)};
+  IdTable idTable{inWidth, qlever::makeAllocatorWithLimit<Id>(0_B)};
 
   sparqlExpression::EvaluationContext evaluationContext =
       createEvaluationContext(*localVocab, idTable.asStaticView<0>());

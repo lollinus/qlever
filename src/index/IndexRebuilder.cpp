@@ -9,6 +9,7 @@
 
 #ifndef QLEVER_REDUCED_FEATURE_SET_FOR_CPP17
 #include "index/IndexRebuilder.h"
+#include "util/Allocator.h"
 
 #include <array>
 #include <boost/asio/awaitable.hpp>
@@ -438,7 +439,7 @@ indexRebuilder::IndexRebuildMapping materializeToIndex(
   // through `newIndex`'s allocator, and if a future change ever does, this
   // will throw immediately rather than silently using whatever allocator
   // the source index happens to have.
-  IndexImpl newIndex{ad_utility::makeAllocatorWithLimit<Id>(0_B)};
+  IndexImpl newIndex{qlever::makeAllocatorWithLimit<Id>(0_B)};
   newIndex.loadConfigFromOldIndex(newIndexName, index, newStats);
 
   REBUILD_LOG_INFO << "Writing new permutations ..." << std::endl;

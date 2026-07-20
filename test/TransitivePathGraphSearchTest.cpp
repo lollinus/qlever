@@ -14,6 +14,7 @@
 #include <thread>
 
 #include "engine/TransitivePathBinSearch.h"
+#include "util/Allocator.h"
 #include "engine/TransitivePathGraphSearch.h"
 #include "engine/TransitivePathHashMap.h"
 #include "global/Constants.h"
@@ -32,7 +33,7 @@ class GraphSearchTest : public Test {
  protected:
   using AdjacencyList = std::unordered_map<size_t, std::vector<size_t>>;
 
-  const ad_utility::AllocatorWithLimit<Id> allocator_ =
+  const qlever::Allocator<Id> allocator_ =
       ad_utility::testing::makeAllocator();
   GraphSearchExecutionParams ep_{
       std::make_shared<ad_utility::CancellationHandle<>>(), allocator_};
@@ -264,7 +265,7 @@ TEST(GraphSearchTestExtraTests, cancellationCheck) {
   // received will be logged.
   SKIP_IF_LOGLEVEL_IS_LOWER(DEBUG);
 
-  const ad_utility::AllocatorWithLimit<Id> allocator =
+  const qlever::Allocator<Id> allocator =
       ad_utility::testing::makeAllocator();
   GraphSearchExecutionParams ep(
       std::make_shared<ad_utility::CancellationHandle<>>(), allocator);

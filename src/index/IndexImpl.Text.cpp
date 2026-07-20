@@ -5,6 +5,7 @@
 //          Hannah Bast <bast@cs.uni-freiburg.de>
 
 #include "index/IndexImpl.h"
+#include "util/Allocator.h"
 
 #include <absl/strings/str_split.h>
 
@@ -59,11 +60,11 @@ void IndexImpl::addTextFromOnDiskIndex() {
 // _____________________________________________________________________________
 IdTable IndexImpl::mergeTextBlockResults(
     absl::FunctionRef<IdTable(const TextBlockMetaData&,
-                              const ad_utility::AllocatorWithLimit<ValueId>&,
+                              const qlever::Allocator<ValueId>&,
                               const ad_utility::File&, TextScoringMetric)>
         reader,
     const std::vector<TextBlockMetadataAndWordInfo>& tbmds,
-    const ad_utility::AllocatorWithLimit<Id>& allocator,
+    const qlever::Allocator<Id>& allocator,
     TextScanMode textScanMode) const {
   AD_CONTRACT_CHECK(tbmds.size() > 0);
   // Collect all blocks as IdTables
@@ -135,7 +136,7 @@ std::string_view IndexImpl::wordIdToString(WordIndex wordIndex) const {
 // _____________________________________________________________________________
 IdTable IndexImpl::getWordPostingsForTerm(
     const std::string& term,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) const {
+    const qlever::Allocator<Id>& allocator) const {
   AD_LOG_DEBUG << "Getting word postings for term: " << term << '\n';
   IdTable idTable{allocator};
   auto tbmds = getTextBlockMetadataForWordOrPrefix(term);
@@ -155,7 +156,7 @@ IdTable IndexImpl::getWordPostingsForTerm(
 // _____________________________________________________________________________
 IdTable IndexImpl::getEntityMentionsForWord(
     const std::string& term,
-    const ad_utility::AllocatorWithLimit<Id>& allocator) const {
+    const qlever::Allocator<Id>& allocator) const {
   auto tbmds = getTextBlockMetadataForWordOrPrefix(term);
   AD_CORRECTNESS_CHECK(!tbmds.empty());
   return mergeTextBlockResults(textIndexReadWrite::readWordEntityCl, tbmds,

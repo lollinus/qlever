@@ -10,6 +10,7 @@
 #include <filesystem>
 
 #include "../util/IdTableHelpers.h"
+#include "util/Allocator.h"
 #include "../util/IndexTestHelpers.h"
 #include "engine/NamedResultCache.h"
 #include "engine/NamedResultCacheSerializer.h"
@@ -29,13 +30,13 @@ class NamedResultCacheSerializerTest : public ::testing::Test {
   // Blank node manager and allocator that can be used when we don't really
   // care about blank nodes and allocation details.
   QueryExecutionContext* qec_ = ad_utility::testing::getQec();
-  ad_utility::AllocatorWithLimit<Id> alloc_{
-      ad_utility::makeUnlimitedAllocator<Id>()};
+  qlever::Allocator<Id> alloc_{
+      qlever::makeAllocator<Id>()};
 
   // Serialize and immediately deserialize and return the `value`.
   NamedResultCache::Value serializeAndDeserializeValue(
       const NamedResultCache::Value& value,
-      ad_utility::AllocatorWithLimit<Id> allocator) const {
+      qlever::Allocator<Id> allocator) const {
     ByteBufferWriteSerializer writeSerializer;
     writeSerializer << value;
     ByteBufferReadSerializer readSerializer{std::move(writeSerializer).data()};
@@ -158,7 +159,7 @@ TEST_F(NamedResultCacheSerializerTest, CacheSerialization) {
     cache.writeToSerializer(writer);
     NamedResultCache cache2;
     ByteBufferReadSerializer reader{std::move(writer).data()};
-    cache2.readFromSerializer(reader, ad_utility::makeUnlimitedAllocator<Id>(),
+    cache2.readFromSerializer(reader, qlever::makeAllocator<Id>(),
                               qec_->getLocalVocabContext());
     return cache2;
   }();
@@ -193,7 +194,7 @@ TEST_F(NamedResultCacheSerializerTest, EmptyCacheSerialization) {
     cache.writeToSerializer(writer);
     NamedResultCache cache2;
     ByteBufferReadSerializer reader{std::move(writer).data()};
-    cache2.readFromSerializer(reader, ad_utility::makeUnlimitedAllocator<Id>(),
+    cache2.readFromSerializer(reader, qlever::makeAllocator<Id>(),
                               qec_->getLocalVocabContext());
     return cache2;
   }();

@@ -14,6 +14,7 @@
 #include <string_view>
 
 #include "./MaterializedViewsTestHelpers.h"
+#include "util/Allocator.h"
 #include "./QueryPlannerTestHelpers.h"
 #include "./ServerTestHelpers.h"
 #include "./util/HttpRequestHelpers.h"
@@ -753,7 +754,7 @@ TEST_F(MaterializedViewsTest, ManualConfigurations) {
   // Test assertions on `Permutation::Type`.
   {
     Permutation testPermutation{Permutation::Enum::SPO,
-                                ad_utility::makeUnlimitedAllocator<Id>()};
+                                qlever::makeAllocator<Id>()};
     const std::string testView1Filename =
         absl::StrCat(testIndexBase_, ".view.testView1");
     // A materialized view permutation does not have a corresponding internal
