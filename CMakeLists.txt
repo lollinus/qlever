@@ -82,6 +82,33 @@ if (EXPRESSION_GENERATOR_BACKPORTS_FOR_CPP17)
     add_compile_definitions(QLEVER_EXPRESSION_GENERATOR_BACKPORTS_FOR_CPP17)
 endif()
 
+# Select the memory-allocator backend that `qlever::Allocator` resolves to
+# (see `src/util/Allocator.h`):
+#   * `limit` (default): the historical `ad_utility::AllocatorWithLimit`.
+#   * `pmr`: a `std::pmr::memory_resource`-based allocator that lets the target
+#     platform inject its own memory pools (e.g. "Hi" / "Lo").
+# The `pmr` value is what allows building and running the same test suite
+# against the polymorphic allocator for validation.
+set(QLEVER_ALLOCATOR_BACKEND "limit" CACHE STRING "Allocator backend: limit or pmr")
+set_property(CACHE QLEVER_ALLOCATOR_BACKEND PROPERTY STRINGS "limit" "pmr")
+if (QLEVER_ALLOCATOR_BACKEND STREQUAL "pmr")
+    message(STATUS "QLever allocator backend: PMR (std::pmr::memory_resource)")
+    add_compile_definitions(QLEVER_USE_PMR_ALLOCATOR)
+elseif (QLEVER_ALLOCATOR_BACKEND STREQUAL "limit")
+    message(STATUS "QLever allocator backend: limit (AllocatorWithLimit)")
+else()
+    message(FATAL_ERROR "QLEVER_ALLOCATOR_BACKEND must be 'limit' or 'pmr', got '${QLEVER_ALLOCATOR_BACKEND}'")
+endif()
+
+# Optional platform configuration header that drives allocator backend
+# selection and provides Hi/Lo memory-resource hooks. See
+# `src/util/AllocatorPlatformConfig.h` for the documented template. Pass a value
+# usable in an `#include` directive, e.g. -DQLEVER_ALLOCATOR_CONFIG_HEADER="my/config.h".
+if (DEFINED QLEVER_ALLOCATOR_CONFIG_HEADER)
+    message(STATUS "QLever allocator config header: ${QLEVER_ALLOCATOR_CONFIG_HEADER}")
+    add_compile_definitions(QLEVER_ALLOCATOR_CONFIG_HEADER="${QLEVER_ALLOCATOR_CONFIG_HEADER}")
+endif()
+
 set(RANGE_V3_REQUIRED_BY_COMPILER OFF)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "11.0.0" AND NOT COMPILER_VERSION_CHECK_DEACTIVATED)

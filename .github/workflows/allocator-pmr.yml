@@ -1,0 +1,59 @@
+name: Allocator PMR backend
+
+# Validates the pluggable allocator seam introduced for BMW allocator support:
+# builds QLever with the `std::pmr::memory_resource` backend selected
+# (`-DQLEVER_ALLOCATOR_BACKEND=pmr`) and runs the allocator validation tests.
+#
+# The intent is to run the *same* test suite under both allocator backends.
+# Today this job builds and runs the dedicated allocator tests under the PMR
+# backend; once the engine-wide type migration to `qlever::Allocator` is
+# complete (see foresight-notes/qlever-allocator/MIGRATION.md), extend the
+# `Build` / `Test` steps below to build and `ctest` the full suite (drop the
+# explicit target and run all tests, exactly like `native-build.yml`).
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  merge_group:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Build both backends so the same sources are validated under each.
+        allocator-backend: [limit, pmr]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: 'recursive'
+      - name: Install dependencies
+        uses: ./.github/workflows/install-dependencies-ubuntu
+      - name: Install compiler
+        uses: ./.github/workflows/install-compiler-ubuntu
+        with:
+          compiler: gcc
+          compiler-version: 13
+
+      - name: Configure CMake
+        run: >
+          cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE="$(pwd)/toolchains/gcc13.cmake"
+          -DQLEVER_ALLOCATOR_BACKEND=${{matrix.allocator-backend}}
+          -DUSE_PARALLEL=true
+          -DADDITIONAL_LINKER_FLAGS="-B /usr/bin/mold"
+
+      - name: Build allocator tests
+        run: cmake --build ${{github.workspace}}/build --config Release --target AllocatorPmrTest AllocatorWithLimitTest -- -j $(nproc)
+
+      - name: Test allocator backend
+        working-directory: ${{github.workspace}}/build/test
+        run: env CTEST_OUTPUT_ON_FAILURE=1 ctest -C Release -j $(nproc) -R 'AllocatorPmrTest|AllocatorWithLimitTest'
