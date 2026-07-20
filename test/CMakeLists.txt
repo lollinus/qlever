@@ -252,6 +252,16 @@ addLinkAndDiscoverTest(AllocatorWithLimitTest)
 
 addLinkAndDiscoverTestNoLibs(AllocatorPmrTest)
 
+# Exercises the platform config-header mechanism end-to-end: this target is
+# compiled with `QLEVER_ALLOCATOR_CONFIG_HEADER` pointing at the example header
+# in `test/util`, which itself selects the PMR backend and provides
+# Hi/Lo resource hooks. See `test/util/QleverAllocatorConfigExample.h`.
+addLinkAndDiscoverTestNoLibs(AllocatorConfigHeaderTest)
+target_include_directories(AllocatorConfigHeaderTest PRIVATE
+        ${CMAKE_SOURCE_DIR}/test/util)
+target_compile_definitions(AllocatorConfigHeaderTest PRIVATE
+        QLEVER_ALLOCATOR_CONFIG_HEADER="QleverAllocatorConfigExample.h")
+
 addLinkAndDiscoverTestNoLibs(AlignedAllocatorTest)
 
 addLinkAndDiscoverTest(MinusTest engine)

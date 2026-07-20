@@ -52,8 +52,8 @@ jobs:
           -DADDITIONAL_LINKER_FLAGS="-B /usr/bin/mold"
 
       - name: Build allocator tests
-        run: cmake --build ${{github.workspace}}/build --config Release --target AllocatorPmrTest AllocatorWithLimitTest -- -j $(nproc)
+        run: cmake --build ${{github.workspace}}/build --config Release --target AllocatorPmrTest AllocatorWithLimitTest AllocatorConfigHeaderTest -- -j $(nproc)
 
       - name: Test allocator backend
         working-directory: ${{github.workspace}}/build/test
-        run: env CTEST_OUTPUT_ON_FAILURE=1 ctest -C Release -j $(nproc) -R 'AllocatorPmrTest|AllocatorWithLimitTest'
+        run: env CTEST_OUTPUT_ON_FAILURE=1 ctest -C Release -j $(nproc) -R 'AllocatorPmrTest|AllocatorWithLimitTest|AllocatorConfigHeaderTest'
